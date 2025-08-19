@@ -1,0 +1,6 @@
+@WebNotes_HostAddress = http://localhost:5057
+
+GET {{WebNotes_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
