@@ -1,6 +1,6 @@
 @WebNotes_HostAddress = http://localhost:5057
 
-### Регистрация пользователя
+### Register user1
 POST {{WebNotes_HostAddress}}/api/auth/register
 Content-Type: application/json
 {
@@ -9,7 +9,7 @@ Content-Type: application/json
   "confirmPassword": "MySecurePass123!"
 }
 
-###Вход пользователя
+### Login user1
 POST {{WebNotes_HostAddress}}/api/auth/login
 Content-Type: application/json
 {
@@ -17,11 +17,11 @@ Content-Type: application/json
   "password": "MySecurePass123!"
 }
 
-###Регистрация2
+### Register user2
 POST {{WebNotes_HostAddress}}/api/auth/register
 Content-Type: application/json
 {
   "email": "alice@domain.com",
-  "password": "11111",
-  "confirmPassword": "11111"
+  "password": "aA!111",
+  "confirmPassword": "aA!111"
 }

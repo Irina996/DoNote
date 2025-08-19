@@ -31,6 +31,7 @@ namespace WebNotes.Controllers {
             {
                 return BadRequest(new { message = "User with such email already exists" });
             }
+            // use email as username
             var user = new IdentityUser {UserName = model.Email, Email = model.Email };
             var result = await _userManager.CreateAsync(user, model.Password);
 
@@ -55,22 +56,42 @@ namespace WebNotes.Controllers {
             return Unauthorized();
         }
 
-        private object GenerateJwtToken(IdentityUser user) {
+        /// Generates a JWT (JSON Web Token) for the authenticated user
+        private object GenerateJwtToken(IdentityUser user) 
+        {
+            // Create a JWT token handler to encode and decode tokens
             var tokenHandler = new JwtSecurityTokenHandler();
+
+            // Retrieve the secret key from configuration and convert it to bytes
             var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
-            var tokenDescriptor = new SecurityTokenDescriptor {
+
+            var tokenDescriptor = new SecurityTokenDescriptor 
+            {
+                // Claims represent the user's identity and permissions
                 Subject = new ClaimsIdentity(new[]
                 {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.Name, user.UserName)
-            }),
+                    // 'sub' (Subject): Unique identifier for the user (user ID)
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+
+                    // 'jti' (JWT ID): Unique identifier for the token (helps prevent replay attacks)
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+
+                    // Standard claim for the user's name (username)
+                    new Claim(ClaimTypes.Name, user.UserName)
+                }),
+
+                // Token expiration: 7 days from now
                 Expires = DateTime.UtcNow.AddDays(7),
+
+                // Signing credentials: use symmetric key and HMAC-SHA256 algorithm
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 
+            // Create the JWT token based on the descriptor
             var token = tokenHandler.CreateToken(tokenDescriptor);
+
+            // Return the token as a string, along with username and expiration time
             return new {
                 token = tokenHandler.WriteToken(token),
                 username = user.UserName,
