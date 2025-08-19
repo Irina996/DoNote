@@ -1,6 +1,27 @@
 @WebNotes_HostAddress = http://localhost:5057
 
-GET {{WebNotes_HostAddress}}/weatherforecast/
-Accept: application/json
+### Регистрация пользователя
+POST {{WebNotes_HostAddress}}/api/auth/register
+Content-Type: application/json
+{
+  "email": "testuser@domain.com",
+  "password": "MySecurePass123!",
+  "confirmPassword": "MySecurePass123!"
+}
 
-###
+###Вход пользователя
+POST {{WebNotes_HostAddress}}/api/auth/login
+Content-Type: application/json
+{
+  "email": "testuser@domain.com",
+  "password": "MySecurePass123!"
+}
+
+###Регистрация2
+POST {{WebNotes_HostAddress}}/api/auth/register
+Content-Type: application/json
+{
+  "email": "alice@domain.com",
+  "password": "11111",
+  "confirmPassword": "11111"
+}
