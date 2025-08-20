@@ -79,6 +79,54 @@ namespace WebNotes.Controllers {
             return Ok(noteModelList);
         }
 
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateNote(int id, [FromBody]UpdateNoteModel model) {
+            var user = await _userManager.GetUserAsync(User);
+
+            // Find the note and ensure it belongs to the user via category ownership
+            var note = await _context.Notes.Include(n => n.Category)
+                .FirstOrDefaultAsync(x => x.Id == id && x.Category.UserId == user.Id);
+            if (note == null)
+            {
+                return NotFound(new { message = "Note not found or access denied." });
+            }
+
+            // Find the category and ensure it belonggs to the user
+            var category = await _context.Categories
+                .FirstOrDefaultAsync(c => c.Id == model.CategoryId && c.UserId == user.Id);
+            if (category == null) {
+                return BadRequest(new { message = "Category not found or access denied." });
+            }
+
+            // Update note fields
+            note.Title = model.Title;
+            note.Content = model.Content;
+            note.IsPinned = model.IsPinned;
+            note.CategoryId = model.CategoryId;
+            note.ChangeDate = DateTime.UtcNow; // Set time of the last update
+
+            _context.Notes.Update(note);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteNote(int id) {
+            var user = await _userManager.GetUserAsync(User);
+
+            var note = await _context.Notes.Include(n => n.Category)
+                .FirstOrDefaultAsync(x => x.Id == id && x.Category.UserId == user.Id);
+            if (note == null) {
+                return NotFound(new { message = "Note not found or access denied." });
+            }
+
+            _context.Notes.Remove(note);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
         private NoteModel MapToNoteModel(Note note) {
             return new NoteModel
             {
