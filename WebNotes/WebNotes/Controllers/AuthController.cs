@@ -5,6 +5,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using WebNotes.Data;
+using WebNotes.Entities;
 using WebNotes.Models;
 
 namespace WebNotes.Controllers {
@@ -14,14 +16,17 @@ namespace WebNotes.Controllers {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly IConfiguration _configuration;
+        private readonly ApplicationDbContext _context;
 
         public AuthController(
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
-            IConfiguration configuration) {
+            IConfiguration configuration,
+            ApplicationDbContext context) {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
+            _context = context;
         }
 
         [HttpPost("register")]
@@ -35,8 +40,11 @@ namespace WebNotes.Controllers {
             var user = new IdentityUser {UserName = model.Email, Email = model.Email };
             var result = await _userManager.CreateAsync(user, model.Password);
 
-            if (result.Succeeded) 
+            if (result.Succeeded)
             {
+                var defaultCategory = new Category { Name = "Uncategorized", UserId = user.Id };
+                _context.Add(defaultCategory);
+                await _context.SaveChangesAsync();
                 return Ok(GenerateJwtToken(user));
             }
 
