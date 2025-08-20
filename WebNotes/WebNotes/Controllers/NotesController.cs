@@ -21,7 +21,7 @@ namespace WebNotes.Controllers {
             _userManager = userManager;
         }
 
-        [HttpPost("create")]
+        [HttpPost]
         public async Task<IActionResult> CreateNote([FromBody]CreateNoteModel model) {
             var user = await _userManager.GetUserAsync(User);
             var category = await _context.Categories
@@ -46,7 +46,7 @@ namespace WebNotes.Controllers {
             _context.Notes.Add(note);
             await _context.SaveChangesAsync();
 
-            var noteModel = mapToNoteModel(note);
+            var noteModel = MapToNoteModel(note);
 
             // send note to user
             return CreatedAtAction(
@@ -65,11 +65,21 @@ namespace WebNotes.Controllers {
             {
                 return NotFound();
             }
-            var noteModel = mapToNoteModel(note);
+            var noteModel = MapToNoteModel(note);
             return Ok(noteModel);
         }
 
-        private NoteModel mapToNoteModel(Note note) {
+        // TODO: add pagination, sorting and filtering
+        [HttpGet]
+        public async Task<IActionResult> GetNotes() {
+            var user = await _userManager.GetUserAsync(User);
+            var notesList = await _context.Notes.Include(n => n.Category)
+                .Where(x => x.Category.UserId == user.Id).ToListAsync();
+            var noteModelList = notesList.Select(MapToNoteModel).ToList();
+            return Ok(noteModelList);
+        }
+
+        private NoteModel MapToNoteModel(Note note) {
             return new NoteModel
             {
                 Id = note.Id,
