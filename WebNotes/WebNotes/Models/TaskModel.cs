@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using WebNotes.Entities;
 
-namespace WebNotes.Entities {
-    public class TaskItem {
+namespace WebNotes.Models {
+    public class TaskModel {
         public int Id { get; set; }
 
         [Required]
@@ -15,9 +15,6 @@ namespace WebNotes.Entities {
 
         public DateTime? Notification { get; set; } = null;
 
-        public int CategoryId { get; set; }
-
-        public virtual TaskCategory Category { get; set; }
-        
+        public CategoryModel Category { get; set; }
     }
 }

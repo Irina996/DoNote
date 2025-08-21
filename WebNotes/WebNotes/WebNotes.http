@@ -25,3 +25,11 @@ Content-Type: application/json
   "password": "aA!111",
   "confirmPassword": "aA!111"
 }
+
+### Login user2
+POST {{WebNotes_HostAddress}}/api/auth/login
+Content-Type: application/json
+{
+  "email": "alice@domain.com",
+  "password": "aA!111"
+}

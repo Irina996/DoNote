@@ -43,7 +43,9 @@ namespace WebNotes.Controllers {
             if (result.Succeeded)
             {
                 var defaultCategory = new Category { Name = "Uncategorized", UserId = user.Id };
-                _context.Add(defaultCategory);
+                _context.Categories.Add(defaultCategory);
+                var defaultTaskCategory = new TaskCategory { Name = "Uncategorized", UserId = user.Id };
+                _context.TaskCategories.Add(defaultTaskCategory);
                 await _context.SaveChangesAsync();
                 return Ok(GenerateJwtToken(user));
             }

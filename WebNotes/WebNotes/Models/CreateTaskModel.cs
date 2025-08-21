@@ -1,18 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace WebNotes.Models {
-    public class CreateNoteModel {
-        [Required]
-        [MinLength(1)]
-        [MaxLength(100)]
-        public string Title { get; set; }
-
+    public class CreateTaskModel {
         [Required]
         [MinLength(1)]
         [MaxLength(5000)]
         public string Content { get; set; }
 
-        public bool IsPinned { get; set; } = false;
+        public DateTime? Notification { get; set; } = null;
 
         [Required]
         public int CategoryId { get; set; }
