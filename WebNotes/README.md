@@ -33,7 +33,7 @@ The API is available at: https://donote-api.onrender.com/api
 
 ## 📂 Project Structure
 
-'''bash
+```bash
 WebNotes/
 ├── Controllers/            # API controllers
 ├── Data/                   # DbContext and factory
@@ -43,7 +43,7 @@ WebNotes/
 ├── Program.cs              # DI, auth, middleware setup
 ├── Dockerfile              # For deployment on Render
 └── appsettings.json        # Configuration
-'''
+```
 
 ---
 
