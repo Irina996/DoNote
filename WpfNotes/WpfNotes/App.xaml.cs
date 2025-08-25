@@ -9,6 +9,18 @@ namespace WpfNotes
     /// </summary>
     public partial class App : Application
     {
+        protected override void OnStartup(StartupEventArgs e) {
+            if (!string.IsNullOrEmpty(Settings.Default.JwtToken))
+            {
+                new MainWindow().Show();
+            }
+            else
+            {
+                new AuthWindow().Show();
+            }
+
+            base.OnStartup(e);
+        }
     }
 
 }
