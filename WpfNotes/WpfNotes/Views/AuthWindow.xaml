@@ -84,11 +84,7 @@
                     HorizontalAlignment="Left"
                     VerticalAlignment="Center"
                     Orientation="Horizontal">
-                    <CheckBox
-                        x:Name="loginRememberCheckBox"
-                        Grid.Row="5"
-                        Grid.Column="1"
-                        Content="Remember me" />
+                    <CheckBox Content="Remember me" IsChecked="{Binding RememberMe}" />
                 </StackPanel>
                 <TextBlock
                     Grid.Row="6"
@@ -130,6 +126,7 @@
                     <RowDefinition Height="0.6*" />
                     <RowDefinition Height="0.4*" />
                     <RowDefinition Height="0.6*" />
+                    <RowDefinition Height="0.5*" />
                     <RowDefinition Height="0.4*" />
                     <RowDefinition Height="0.9*" />
                     <RowDefinition Height="0.6*" />
@@ -187,13 +184,22 @@
                     VerticalContentAlignment="Center"
                     FontSize="16"
                     PasswordChanged="ConfirmPasswordBox_PasswordChanged" />
-                <TextBlock
+                <StackPanel
                     Grid.Row="7"
+                    Grid.Column="1"
+                    Margin="5"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal">
+                    <CheckBox Content="Remember me" IsChecked="{Binding RememberMe}" />
+                </StackPanel>
+                <TextBlock
+                    Grid.Row="8"
                     Grid.Column="1"
                     Foreground="Red"
                     Text="{Binding ErrorMessage}" />
                 <Button
-                    Grid.Row="8"
+                    Grid.Row="9"
                     Grid.Column="1"
                     Margin="50,15,50,5"
                     Background="#FFEC99"
@@ -202,7 +208,7 @@
                     FontSize="20"
                     Style="{DynamicResource RoundedButton}" />
                 <TextBlock
-                    Grid.Row="9"
+                    Grid.Row="10"
                     Grid.Column="1"
                     Margin="5"
                     HorizontalAlignment="Center"

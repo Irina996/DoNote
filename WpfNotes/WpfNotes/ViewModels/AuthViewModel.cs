@@ -16,6 +16,7 @@ namespace WpfNotes.ViewModels
         private string _email = "";
         private string _password = "";
         private string _confirmPassword = "";
+        private bool _isRememberMe = false;
         private string _errorMessage = "";
 
         public string Email
@@ -45,6 +46,15 @@ namespace WpfNotes.ViewModels
                 OnPropertyChanged(nameof(ConfirmPassword));
             }
         }
+        public bool IsRememberMe
+        {
+            get => _isRememberMe;
+            set
+            {
+                _isRememberMe = value;
+                OnPropertyChanged(nameof(IsRememberMe));
+            }
+        }
         public string ErrorMessage
         {
             get => _errorMessage;
@@ -71,7 +81,6 @@ namespace WpfNotes.ViewModels
             _apiService = new AuthService();
             LoginCommand = new ViewModelCommand(ExecuteLoginCommand);
             RegisterCommand = new ViewModelCommand(ExecuteRegisterCommand);
-            ErrorMessage = "";
         }
 
 
@@ -99,8 +108,11 @@ namespace WpfNotes.ViewModels
             var token = await _apiService.LoginAsync(new LoginModel { Email = Email, Password = Password });
             if (token != null)
             {
-                Settings.Default.JwtToken = token;
-                Settings.Default.Save();
+                if (IsRememberMe)
+                {
+                    Settings.Default.JwtToken = token;
+                    Settings.Default.Save();
+                }
                 ChangeWindow();
             }
             else
@@ -148,8 +160,11 @@ namespace WpfNotes.ViewModels
                 });
             if (token != null)
             {
-                Settings.Default.JwtToken = token;
-                Settings.Default.Save();
+                if (IsRememberMe)
+                {
+                    Settings.Default.JwtToken = token;
+                    Settings.Default.Save();
+                }
                 ChangeWindow();
             }
             else
