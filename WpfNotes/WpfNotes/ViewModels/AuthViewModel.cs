@@ -5,14 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using WpfNotes.Models;
-using WpfNotes.Services;
+using WpfNotes.Models.Auth;
 
 namespace WpfNotes.ViewModels
 {
     public class AuthViewModel : ViewModelBase, IChangeWindows
     {
-        private readonly AuthService _apiService;
+        private readonly AuthModel _authModel;
         private string _email = "";
         private string _password = "";
         private string _confirmPassword = "";
@@ -78,7 +77,7 @@ namespace WpfNotes.ViewModels
 
         public AuthViewModel()
         {
-            _apiService = new AuthService();
+            _authModel = new AuthModel();
             LoginCommand = new ViewModelCommand(ExecuteLoginCommand);
             RegisterCommand = new ViewModelCommand(ExecuteRegisterCommand);
         }
@@ -105,14 +104,10 @@ namespace WpfNotes.ViewModels
             {
                 return;
             }
-            var token = await _apiService.LoginAsync(new LoginModel { Email = Email, Password = Password });
-            if (token != null)
+            ErrorMessage = "Logging in...";
+            var result = await _authModel.LoginAsync(Email, Password, IsRememberMe);
+            if (result)
             {
-                if (IsRememberMe)
-                {
-                    Settings.Default.JwtToken = token;
-                    Settings.Default.Save();
-                }
                 ChangeWindow();
             }
             else
@@ -152,19 +147,10 @@ namespace WpfNotes.ViewModels
             {
                 return;
             }
-            var token = await _apiService.RegisterAsync(
-                new RegisterModel { 
-                    Email = Email, 
-                    Password = Password, 
-                    ConfirmPassword = ConfirmPassword 
-                });
-            if (token != null)
+            ErrorMessage = "Registering...";
+            var result = await _authModel.RegisterAsync(Email, Password, ConfirmPassword, IsRememberMe);
+            if (result)
             {
-                if (IsRememberMe)
-                {
-                    Settings.Default.JwtToken = token;
-                    Settings.Default.Save();
-                }
                 ChangeWindow();
             }
             else
@@ -172,10 +158,5 @@ namespace WpfNotes.ViewModels
                 ErrorMessage = "Invalid email or password";
             }
         }
-    }
-
-    interface IChangeWindows
-    {
-        Action Change { get; set; }
     }
 }
