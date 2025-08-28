@@ -1,6 +1,7 @@
 ﻿using System.Configuration;
 using System.Data;
 using System.Windows;
+using WpfNotes.Services;
 
 namespace WpfNotes
 {
@@ -12,6 +13,7 @@ namespace WpfNotes
         protected override void OnStartup(StartupEventArgs e) {
             if (!string.IsNullOrEmpty(Settings.Default.JwtToken))
             {
+                ApiService.GetInstance(Settings.Default.JwtToken);
                 new MainWindow().Show();
             }
             else
