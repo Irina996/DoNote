@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WpfNotes.Models.Auth
+namespace WpfNotes.ApiModels.Auth
 {
     public class AuthResponse
     {

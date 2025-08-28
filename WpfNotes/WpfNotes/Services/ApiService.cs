@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
+using WpfNotes.ApiModels.Note;
 using WpfNotes.Models.Note;
 
 namespace WpfNotes.Services
@@ -74,10 +75,17 @@ namespace WpfNotes.Services
             return new List<Category>();
         }
 
-        public async Task<Note> CreateNoteAsync(CreateNoteModel model)
+        public async Task<Note> CreateNoteAsync(Note note)
         {
             var request = new HttpRequestMessage(HttpMethod.Post, notesRoute);
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
+            CreateNoteRequest model = new CreateNoteRequest
+            {
+                Title = note.Title,
+                Content = note.Content,
+                IsPinned = note.IsPinned,
+                CategoryId = note.Category.Id
+            };
             request.Content = JsonContent.Create(model);
 
             var response = await _httpClient.SendAsync(request);

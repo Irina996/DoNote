@@ -7,7 +7,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
-using WpfNotes.Models.Auth;
+using WpfNotes.ApiModels.Auth;
 
 namespace WpfNotes.Services
 {
@@ -30,7 +30,7 @@ namespace WpfNotes.Services
             _httpClient.BaseAddress = new Uri(config["ApiSettings:BaseUrl"]);
         }
 
-        public async Task<string> LoginAsync(LoginModel model)
+        public async Task<string> LoginAsync(LoginRequest model)
         {
             JsonContent content = JsonContent.Create(model);
             using var response = await _httpClient.PostAsync(loginRoute, content);
@@ -43,7 +43,7 @@ namespace WpfNotes.Services
             return null;
         }
 
-        public async Task<string> RegisterAsync(RegisterModel model)
+        public async Task<string> RegisterAsync(RegisterRequest model)
         {
             JsonContent content = JsonContent.Create(model);
             using var response = await _httpClient.PostAsync(registerRoute, content);

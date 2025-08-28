@@ -4,11 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WpfNotes.Models.Auth
+namespace WpfNotes.ApiModels.Auth
 {
-    public class LoginModel
+    public class RegisterRequest
     {
         public string Email { get; set; }
         public string Password { get; set; }
+
+        public string ConfirmPassword { get; set; }
     }
 }

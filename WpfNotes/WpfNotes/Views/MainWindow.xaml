@@ -10,7 +10,6 @@
     Title="MainWindow"
     Width="800"
     Height="450"
-    d:DataContext="{d:DesignInstance Type=viewModel:MainViewModel}"
     FontFamily="{StaticResource Excalifont}"
     FontSize="14"
     mc:Ignorable="d">
@@ -120,8 +119,7 @@
                         Text="{Binding NotesViewModel.SearchText, UpdateSourceTrigger=PropertyChanged}">
                         <i:Interaction.Triggers>
                             <i:PropertyChangedTrigger Binding="{Binding NotesViewModel.SearchText}">
-                                <i:InvokeCommandAction Command="{Binding NotesViewModel.SearchNoteCommand}"
-                                  CommandParameter="{Binding NotesViewModel.SearchText}" />
+                                <i:InvokeCommandAction Command="{Binding NotesViewModel.SearchNoteCommand}" CommandParameter="{Binding NotesViewModel.SearchText}" />
                             </i:PropertyChangedTrigger>
                         </i:Interaction.Triggers>
                     </TextBox>
