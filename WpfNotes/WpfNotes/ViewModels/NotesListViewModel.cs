@@ -20,6 +20,7 @@ namespace WpfNotes.ViewModels
         private Note _selectedNote;
         private Category _selectedCategory;
         private string _searchText;
+        private bool _isLoading;
 
         public ObservableCollection<Note> Notes
         {
@@ -66,24 +67,32 @@ namespace WpfNotes.ViewModels
                 OnPropertyChanged(nameof(SearchText));
             }
         }
+        public bool IsLoading
+        {
+            get => _isLoading;
+            set
+            {  
+                _isLoading = value;
+                OnPropertyChanged(nameof(IsLoading));
+            }
+        }
 
+        public ICommand LoadCommand { get; }
         public ICommand CreateNoteCommand { get; }
         public ICommand EditNoteCommand { get;  }
-
         public ICommand CreateCategoryCommand { get; }
         public ICommand EditCategoryCommand { get; }
-
         public ICommand SearchNoteCommand {  get; }
-
         public ICommand ChangeSelectedCategoryCommand { get; }
 
-        public Action<Note, IEnumerable<Category>> OpenNoteWindowAction { get; set; }
+        public Action<Note, List<Category>, bool> OpenNoteWindowAction { get; set; }
         public Action<Category> OpenCategoryWindowAction { get; set; }
 
         public NotesListViewModel()
         {
             _notesModel.PropertyChanged += OnNotesModelPropertyChanged;
 
+            LoadCommand = new ViewModelCommand(LoadData);
             CreateNoteCommand = new ViewModelCommand(CreateNote);
             EditNoteCommand = new ViewModelCommand(EditNote);
             CreateCategoryCommand = new ViewModelCommand(CreateCategory);
@@ -94,13 +103,6 @@ namespace WpfNotes.ViewModels
             _notes = new ObservableCollection<Note>();
             _categories = new ObservableCollection<Category>();
             _searchText = "";
-
-            LoadData();
-        }
-
-        private async void LoadData()
-        {
-            await _notesModel.LoadAsync();
         }
 
         private void OnNotesModelPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -118,24 +120,31 @@ namespace WpfNotes.ViewModels
             }
             else if (e.PropertyName == nameof(NotesListModel.Categories))
             {
-                Categories.Clear();
+                _categories.Clear();
                 // add "All" category
-                Categories.Add(new Category {Id = 0, Name = "All"});
-                SelectedCategory = Categories[0];
+                _categories.Add(new Category {Id = 0, Name = "All"});
+                _selectedCategory = Categories[0];
                 foreach (var category in _notesModel.Categories)
                 {
-                    Categories.Add(category);
+                    _categories.Add(category);
                 }
                 OnPropertyChanged(nameof(Categories));
                 OnPropertyChanged(nameof(SelectedCategory));
             }
         }
 
-        private void OpenNoteWindow(Note note)
+        private async void LoadData(object obj)
+        {
+            IsLoading = true;
+            await _notesModel.LoadAsync();
+            IsLoading = false;
+        }
+
+        private void OpenNoteWindow(Note note, bool isNewNote)
         {
             List<Category> categories = new List<Category>(_categories);
             categories.RemoveAt(0); // remove "All" category
-            OpenNoteWindowAction?.Invoke(note, categories);
+            OpenNoteWindowAction?.Invoke(note, categories, isNewNote);
         }
 
         private void OpenCategoryWindow(Category category)
@@ -145,12 +154,12 @@ namespace WpfNotes.ViewModels
 
         private void CreateNote(object obj)
         {
-            OpenNoteWindow(new Note());
+            OpenNoteWindow(new Note(), true);
         }
 
         private void EditNote(object obj)
         {
-            OpenNoteWindow(SelectedNote);
+            OpenNoteWindow(SelectedNote, false);
         }
 
         private void CreateCategory(object obj)

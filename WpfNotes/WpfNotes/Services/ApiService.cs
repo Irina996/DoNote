@@ -19,10 +19,10 @@ namespace WpfNotes.Services
 
         private readonly string _token;
 
-        private readonly string notesRoute = "api/notes";
-        private readonly string noteCategoriesRoute = "api/categories";
-        private readonly string tasksRoute = "api/tasks";
-        private readonly string taskCategoriesRoute = "api/taskcategories";
+        private readonly string notesRoute = "api/notes/";
+        private readonly string noteCategoriesRoute = "api/categories/";
+        private readonly string tasksRoute = "api/tasks/";
+        private readonly string taskCategoriesRoute = "api/taskcategories/";
 
         private ApiService(string token)
         {
@@ -94,6 +94,40 @@ namespace WpfNotes.Services
                 return await response.Content.ReadFromJsonAsync<Note>();
             }
             return null;
+        }
+
+        public async Task<bool> UpdateNoteAsync(Note note)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Put, notesRoute + note.Id);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
+            UpdateNoteRequest model = new UpdateNoteRequest
+            {
+                Title = note.Title,
+                Content = note.Content,
+                IsPinned = note.IsPinned,
+                CategoryId = note.Category.Id
+            };
+            request.Content = JsonContent.Create(model);
+
+            var response = await _httpClient.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<bool> DeleteNoteAsync(Note note)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Delete, notesRoute + note.Id);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
+
+            var response = await _httpClient.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

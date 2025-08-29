@@ -42,7 +42,8 @@ namespace WpfNotes.Models.Note
         {
             try
             {
-                _allNotes = await _apiService.GetNotesAsync();
+                _allNotes = (await _apiService.GetNotesAsync())
+                    .OrderByDescending(n => n.ChangeDate).ToList();
                 Notes = _allNotes;
 
                 var categories = await _apiService.GetNoteCategoriesAsync();
@@ -59,12 +60,16 @@ namespace WpfNotes.Models.Note
             Notes = _allNotes
                 .Where(n => n.Title.ToLower().IndexOf(text.ToLower()) > -1 
                     || n.Content.ToLower().IndexOf(text.ToLower()) > -1)
+                .OrderByDescending(n => n.ChangeDate)
                 .ToList();
         }
 
         public void FilterNotes(Category category)
         {
-            Notes = _allNotes.Where(n => n.Category.Id == category.Id).ToList();
+            Notes = _allNotes
+                .Where(n => n.Category.Id == category.Id)
+                .OrderByDescending(n => n.ChangeDate)
+                .ToList();
         }
 
         public void GetAllNotes()

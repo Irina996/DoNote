@@ -31,13 +31,11 @@ namespace WpfNotes
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            _viewModel.NotesViewModel.OpenNoteWindowAction += (note, categories) =>
+            _viewModel.NotesViewModel.OpenNoteWindowAction += (note, categories, isNewNote) =>
             {
-                throw new NotImplementedException();
-                /*
-                NoteWindow noteWindow = new NoteWindow(note, categories);
+                NoteWindow noteWindow = new NoteWindow(note, categories, isNewNote);
                 noteWindow.Show();
-                */
+                this.Close();
             };
             _viewModel.NotesViewModel.OpenCategoryWindowAction += (category) =>
             {

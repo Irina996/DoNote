@@ -10,11 +10,26 @@
     Title="MainWindow"
     Width="800"
     Height="450"
+    d:DataContext="{d:DesignInstance Type=viewModel:MainViewModel}"
     FontFamily="{StaticResource Excalifont}"
     FontSize="14"
     mc:Ignorable="d">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Window.Resources>
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding NotesViewModel.LoadCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <TabControl>
         <TabItem Header="Notes">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="Selected">
+                    <i:InvokeCommandAction Command="{Binding NotesViewModel.LoadCommand}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+
             <!--  Notes  -->
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -140,7 +155,8 @@
                         Grid.Row="1"
                         Margin="5"
                         Background="Transparent"
-                        ItemsSource="{Binding NotesViewModel.Notes}">
+                        ItemsSource="{Binding NotesViewModel.Notes}"
+                        SelectedItem="{Binding NotesViewModel.SelectedNote}">
 
                         <!--  Double click on note  -->
                         <i:Interaction.Triggers>
@@ -206,6 +222,31 @@
                         Content="Add"
                         Style="{StaticResource RoundedButton}" />
                 </Grid>
+
+                <!--  Loading Overlay  -->
+                <Border
+                    x:Name="LoadingOverlay"
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3"
+                    Panel.ZIndex="100"
+                    Background="#88000000"
+                    Visibility="{Binding NotesViewModel.IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <Grid>
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <ProgressBar
+                                Width="100"
+                                Height="20"
+                                Foreground="#e6c03a"
+                                IsIndeterminate="True" />
+                            <TextBlock
+                                Margin="0,10,0,0"
+                                Foreground="White"
+                                Text="Loading..."
+                                TextAlignment="Center" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
             </Grid>
         </TabItem>
         <TabItem Header="Tasks">
