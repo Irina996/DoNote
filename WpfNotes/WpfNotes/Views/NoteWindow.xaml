@@ -25,7 +25,7 @@
             <ColumnDefinition Width="50*" />
             <ColumnDefinition Width="50*" />
             <ColumnDefinition Width="49*" />
-            <ColumnDefinition/>
+            <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <Button
             Grid.Row="0"
@@ -74,9 +74,14 @@
             Grid.Column="0"
             Grid.ColumnSpan="4"
             Margin="10,10,6,10"
+            AcceptsReturn="True"
+            AcceptsTab="True"
             GotFocus="NoteContentTextBox_GotFocus"
+            HorizontalScrollBarVisibility="Auto"
             LostFocus="NoteContentTextBox_LostFocus"
-            Text="{Binding Note.Content}" />
+            Text="{Binding Note.Content}"
+            TextWrapping="Wrap"
+            VerticalScrollBarVisibility="Auto" />
         <TextBlock
             x:Name="HintNoteContentTextBlock"
             Grid.Row="2"
