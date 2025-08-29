@@ -13,6 +13,7 @@
     d:DataContext="{d:DesignInstance Type=viewModel:MainViewModel}"
     FontFamily="{StaticResource Excalifont}"
     FontSize="14"
+    WindowState="Maximized"
     mc:Ignorable="d">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
@@ -61,6 +62,8 @@
                     <!--  Categories list  -->
                     <ListBox
                         Margin="10"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
                         BorderThickness="0"
                         ItemsSource="{Binding NotesViewModel.Categories}"
                         SelectedItem="{Binding NotesViewModel.SelectedCategory}">
@@ -118,7 +121,7 @@
                 <!--  Right Panel (Notes)  -->
                 <Grid Grid.Column="2" Background="#f5f3e5">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="0.15*" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 

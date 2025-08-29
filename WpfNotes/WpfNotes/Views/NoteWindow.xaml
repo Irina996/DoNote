@@ -12,25 +12,29 @@
     d:DataContext="{d:DesignInstance Type=viewModel:NoteViewModel}"
     FontFamily="{StaticResource Excalifont}"
     FontSize="14"
+    WindowState="Maximized"
+    WindowStyle="None"
     mc:Ignorable="d">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="0.25*" />
-            <RowDefinition Height="0.4*" />
-            <RowDefinition Height="2*" />
-            <RowDefinition Height="0.4*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="50*" />
             <ColumnDefinition Width="50*" />
             <ColumnDefinition Width="50*" />
             <ColumnDefinition Width="49*" />
-            <ColumnDefinition/>
+            <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <Button
             Grid.Row="0"
             Grid.Column="0"
-            Margin="2,2,0,2"
+            Width="150"
+            Height="30"
+            Margin="0,0,0,5"
             Padding="20,5,20,5"
             HorizontalAlignment="Left"
             Background="#f5f3e5"
@@ -39,8 +43,10 @@
         <Button
             Grid.Row="0"
             Grid.Column="3"
-            Margin="142,2,0,2"
-            HorizontalAlignment="Left"
+            Width="150"
+            Height="30"
+            Margin="5,0,0,0"
+            HorizontalAlignment="Right"
             Background="#ff99ac"
             Command="{Binding DeleteCommand}"
             Content="Delete" />
@@ -49,7 +55,7 @@
             Grid.Row="1"
             Grid.Column="0"
             Grid.ColumnSpan="4"
-            Margin="10,0,6,0"
+            Margin="10,10,10,10"
             VerticalAlignment="Center"
             BorderThickness="0"
             FontSize="24"
@@ -74,15 +80,24 @@
             Grid.Column="0"
             Grid.ColumnSpan="4"
             Margin="10,10,6,10"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            AcceptsReturn="True"
+            AcceptsTab="True"
             GotFocus="NoteContentTextBox_GotFocus"
+            HorizontalScrollBarVisibility="Auto"
             LostFocus="NoteContentTextBox_LostFocus"
-            Text="{Binding Note.Content}" />
+            Text="{Binding Note.Content}"
+            TextWrapping="Wrap"
+            VerticalScrollBarVisibility="Auto" />
         <TextBlock
             x:Name="HintNoteContentTextBlock"
             Grid.Row="2"
             Grid.Column="0"
             Grid.ColumnSpan="4"
             Margin="10,10,6,10"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
             Foreground="Gray"
             IsHitTestVisible="False"
             Text="Write something..."
@@ -91,6 +106,8 @@
             x:Name="categoryComboBox"
             Grid.Row="3"
             Grid.Column="0"
+            Width="150"
+            Height="30"
             Margin="10,5,10,10"
             HorizontalContentAlignment="Left"
             VerticalContentAlignment="Center"
@@ -100,6 +117,8 @@
         <Button
             Grid.Row="3"
             Grid.Column="2"
+            Width="150"
+            Height="50"
             Margin="10,5,10,5"
             Command="{Binding CancelCommand}"
             Content="Cancel"
@@ -107,6 +126,8 @@
         <Button
             Grid.Row="3"
             Grid.Column="3"
+            Width="150"
+            Height="50"
             Margin="10,5,6,5"
             Command="{Binding SaveCommand}"
             Content="Save"

@@ -10,7 +10,7 @@ using WpfNotes.Models.Note;
 
 namespace WpfNotes.ViewModels
 {
-    public class NoteViewModel : ViewModelBase, IChangeWindows
+    public class NoteViewModel : ViewModelBase, IChangeWindows, IConfirm
     {
         private NoteModel _noteModel;
 
@@ -33,6 +33,7 @@ namespace WpfNotes.ViewModels
         public ICommand BackCommand { get; }
 
         public Action Change { get; set; }
+        public Predicate<string> Confirm { get; set; }
 
         public NoteViewModel(Note note, List<Category> categories, bool isNewNote)
         {
@@ -59,29 +60,38 @@ namespace WpfNotes.ViewModels
 
         private void SaveNote(object obj)
         {
-            if (isNewNote)
+            if (Confirm?.Invoke("Save the note?") ?? false)
             {
-                _noteModel.CreateNote();
-                isNewNote = false;
-            }
-            else
-            {
-                _noteModel.UpdateNote();
+                if (isNewNote)
+                {
+                    _noteModel.CreateNote();
+                    isNewNote = false;
+                }
+                else
+                {
+                    _noteModel.UpdateNote();
+                }
             }
         }
 
         private void DeleteNote(object obj)
         {
-            if (!isNewNote)
+            if (Confirm?.Invoke("Delete the note?") ?? false)
             {
-                _noteModel.DeleteNote();
+                if (!isNewNote)
+                {
+                    _noteModel.DeleteNote();
+                }
+                CloseWindow();
             }
-            CloseWindow();
         }
 
         private void Cancel(object obj)
         {
-            _noteModel.CancelChanges();
+            if (Confirm?.Invoke("Cancel?") ?? false)
+            {
+                _noteModel.CancelChanges();
+            }
         }
 
         private void Back(object obj)
