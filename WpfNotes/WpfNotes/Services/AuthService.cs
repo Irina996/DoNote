@@ -7,51 +7,51 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
-using WpfNotes.Models;
+using WpfNotes.ApiModels.Auth;
 
 namespace WpfNotes.Services
 {
-    class AuthService
+    public class AuthService
     {
         private readonly HttpClient _httpClient;
 
-        private readonly string apiUrl;
+        private string _token;
 
-        private readonly string loginRoute = "/auth/login";
-        private readonly string registerRoute = "auth/register";
+        private readonly string loginRoute = "api/auth/login";
+        private readonly string registerRoute = "api/auth/register";
 
         public AuthService()
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-
             IConfiguration config = builder.Build();
-            apiUrl = config["ApiSettings:BaseUrl"];
-
             _httpClient = new HttpClient();
+            _httpClient.BaseAddress = new Uri(config["ApiSettings:BaseUrl"]);
         }
 
-        public async Task<string> LoginAsync(LoginModel model)
+        public async Task<string> LoginAsync(LoginRequest model)
         {
             JsonContent content = JsonContent.Create(model);
-            using var response = await _httpClient.PostAsync(apiUrl + loginRoute, content);
+            using var response = await _httpClient.PostAsync(loginRoute, content);
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<AuthResponse>();
-                return result?.token;
+                _token = result?.token;
+                return _token;
             }
             return null;
         }
 
-        public async Task<string> RegisterAsync(RegisterModel model)
+        public async Task<string> RegisterAsync(RegisterRequest model)
         {
             JsonContent content = JsonContent.Create(model);
-            using var response = await _httpClient.PostAsync(apiUrl + registerRoute, content);
+            using var response = await _httpClient.PostAsync(registerRoute, content);
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<AuthResponse>();
-                return result?.token;
+                _token = result?.token;
+                return _token;
             }
             return null;
         }

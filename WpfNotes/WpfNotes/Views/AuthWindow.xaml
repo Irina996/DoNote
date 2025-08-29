@@ -84,7 +84,7 @@
                     HorizontalAlignment="Left"
                     VerticalAlignment="Center"
                     Orientation="Horizontal">
-                    <CheckBox Content="Remember me" IsChecked="{Binding RememberMe}" />
+                    <CheckBox Content="Remember me" IsChecked="{Binding IsRememberMe}" />
                 </StackPanel>
                 <TextBlock
                     Grid.Row="6"
@@ -191,7 +191,7 @@
                     HorizontalAlignment="Left"
                     VerticalAlignment="Center"
                     Orientation="Horizontal">
-                    <CheckBox Content="Remember me" IsChecked="{Binding RememberMe}" />
+                    <CheckBox Content="Remember me" IsChecked="{Binding IsRememberMe}" />
                 </StackPanel>
                 <TextBlock
                     Grid.Row="8"

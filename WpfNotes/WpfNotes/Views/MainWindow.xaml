@@ -1,12 +1,309 @@
-﻿<Window x:Class="WpfNotes.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WpfNotes"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        <TextBlock FontFamily="{StaticResource Excalifont}" Text="Example of text.Check if font is working"></TextBlock>
-    </Grid>
+﻿<Window
+    x:Class="WpfNotes.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:local="clr-namespace:WpfNotes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModel="clr-namespace:WpfNotes.ViewModels"
+    Title="MainWindow"
+    Width="800"
+    Height="450"
+    d:DataContext="{d:DesignInstance Type=viewModel:MainViewModel}"
+    FontFamily="{StaticResource Excalifont}"
+    FontSize="14"
+    mc:Ignorable="d">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Window.Resources>
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding NotesViewModel.LoadCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <TabControl>
+        <TabItem Header="Notes">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="Selected">
+                    <i:InvokeCommandAction Command="{Binding NotesViewModel.LoadCommand}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+
+            <!--  Notes  -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.35*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <!--  Left Panel (Categories)  -->
+                <StackPanel
+                    Grid.Column="0"
+                    Background="White"
+                    Orientation="Vertical">
+
+                    <TextBlock Margin="5" FontSize="18">Categories</TextBlock>
+
+                    <Button
+                        Margin="10"
+                        Padding="5"
+                        HorizontalContentAlignment="Left"
+                        Background="Transparent"
+                        Command="{Binding NotesViewModel.CreateCategoryCommand}"
+                        Content="New..."
+                        Foreground="Gray" />
+
+                    <!--  Categories list  -->
+                    <ListBox
+                        Margin="10"
+                        BorderThickness="0"
+                        ItemsSource="{Binding NotesViewModel.Categories}"
+                        SelectedItem="{Binding NotesViewModel.SelectedCategory}">
+
+                        <!--  Set light yellow color for selected item  -->
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBoxItem">
+                                            <Border
+                                                x:Name="Border"
+                                                Padding="2"
+                                                SnapsToDevicePixels="true">
+                                                <ContentPresenter />
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsSelected" Value="true">
+                                                    <Setter TargetName="Border" Property="Background" Value="#fff9db" />
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+
+                        <i:Interaction.Triggers>
+                            <!--  Select note category  -->
+                            <i:EventTrigger EventName="SelectionChanged">
+                                <i:InvokeCommandAction Command="{Binding NotesViewModel.ChangeSelectedCategoryCommand}" CommandParameter="{Binding NotesViewModel.SelectedCategory}" />
+                            </i:EventTrigger>
+                            <!--  Double click on note category  -->
+                            <i:EventTrigger EventName="MouseDoubleClick">
+                                <i:InvokeCommandAction Command="{Binding NotesViewModel.EditCategoryCommand}" CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=ListBox}}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+
+                <!--  Grid splitter  -->
+                <GridSplitter
+                    Grid.Column="1"
+                    Width="3"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Stretch"
+                    ShowsPreview="False" />
+
+                <!--  Right Panel (Notes)  -->
+                <Grid Grid.Column="2" Background="#f5f3e5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="0.15*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!--  Search box  -->
+                    <TextBox
+                        x:Name="SearchTextBox"
+                        Grid.Row="0"
+                        Margin="10"
+                        Padding="5"
+                        VerticalAlignment="Top"
+                        GotFocus="SearchTextBox_GotFocus"
+                        LostFocus="SearchTextBox_LostFocus"
+                        Text="{Binding NotesViewModel.SearchText, UpdateSourceTrigger=PropertyChanged}">
+                        <i:Interaction.Triggers>
+                            <i:PropertyChangedTrigger Binding="{Binding NotesViewModel.SearchText}">
+                                <i:InvokeCommandAction Command="{Binding NotesViewModel.SearchNoteCommand}" CommandParameter="{Binding NotesViewModel.SearchText}" />
+                            </i:PropertyChangedTrigger>
+                        </i:Interaction.Triggers>
+                    </TextBox>
+                    <!--  search hint  -->
+                    <TextBlock
+                        x:Name="HintSearchTextBlock"
+                        Grid.Row="0"
+                        Margin="10"
+                        Padding="5"
+                        VerticalAlignment="Top"
+                        Foreground="Gray"
+                        IsHitTestVisible="False"
+                        Text="Search"
+                        Visibility="Visible" />
+
+                    <!--  Notes list  -->
+                    <ListBox
+                        Grid.Row="1"
+                        Margin="5"
+                        Background="Transparent"
+                        ItemsSource="{Binding NotesViewModel.Notes}"
+                        SelectedItem="{Binding NotesViewModel.SelectedNote}">
+
+                        <!--  Double click on note  -->
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseDoubleClick">
+                                <i:InvokeCommandAction Command="{Binding NotesViewModel.EditNoteCommand}" CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=ListBox}}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+
+                        <!--  Do not show vertical scrollbar  -->
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.Resources>
+                            <Style TargetType="ScrollViewer">
+                                <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
+                            </Style>
+                        </ListBox.Resources>
+
+                        <!--  Note template for list  -->
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Background="White">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="2*" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="0.5*" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock
+                                        Grid.Row="0"
+                                        Margin="10,10,10,0"
+                                        FontSize="20"
+                                        Text="{Binding Title}" />
+                                    <TextBlock
+                                        Grid.Row="1"
+                                        MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
+                                        MaxHeight="44"
+                                        Margin="10,5,10,0"
+                                        Text="{Binding Content}"
+                                        TextTrimming="CharacterEllipsis"
+                                        TextWrapping="Wrap" />
+                                    <TextBlock
+                                        Grid.Row="2"
+                                        Margin="10,5,10,5"
+                                        FontSize="10"
+                                        Foreground="#868e96"
+                                        Text="{Binding ChangeDate, StringFormat='{}{0:dd/MM/yyyy}'}" />
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <!--  Add note button  -->
+                    <Button
+                        Grid.Row="1"
+                        Width="80"
+                        Height="50"
+                        Margin="0,0,20,30"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Bottom"
+                        Command="{Binding NotesViewModel.CreateNoteCommand}"
+                        Content="Add"
+                        Style="{StaticResource RoundedButton}" />
+                </Grid>
+
+                <!--  Loading Overlay  -->
+                <Border
+                    x:Name="LoadingOverlay"
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3"
+                    Panel.ZIndex="100"
+                    Background="#88000000"
+                    Visibility="{Binding NotesViewModel.IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <Grid>
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <ProgressBar
+                                Width="100"
+                                Height="20"
+                                Foreground="#e6c03a"
+                                IsIndeterminate="True" />
+                            <TextBlock
+                                Margin="0,10,0,0"
+                                Foreground="White"
+                                Text="Loading..."
+                                TextAlignment="Center" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+        </TabItem>
+        <TabItem Header="Tasks">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.35*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <!--  Left Panel (Categories)  -->
+                <StackPanel
+                    Grid.Column="0"
+                    Background="White"
+                    Orientation="Vertical">
+                    <TextBlock Margin="5">Categories</TextBlock>
+                    <TextBox Margin="10" Text="New..." />
+                    <ListBox x:Name="tasksCategoriesListBox" />
+                </StackPanel>
+                <GridSplitter
+                    Grid.Column="1"
+                    Width="3"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Stretch"
+                    ShowsPreview="False" />
+
+                <!--  Right Panel (Tasks)  -->
+                <Grid Grid.Column="2" Background="#f5f3e5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="0.1*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBox
+                        Grid.Row="0"
+                        Margin="10"
+                        VerticalAlignment="Top"
+                        Text="Search" />
+                    <ListBox
+                        Grid.Row="1"
+                        Margin="5"
+                        Background="Transparent" />
+                    <Button
+                        Grid.Row="1"
+                        Width="80"
+                        Height="50"
+                        Margin="0,0,20,30"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Bottom"
+                        Background="#FFEC99"
+                        Content="Add"
+                        FontSize="20"
+                        Style="{StaticResource RoundedButton}" />
+                </Grid>
+            </Grid>
+        </TabItem>
+    </TabControl>
 </Window>
