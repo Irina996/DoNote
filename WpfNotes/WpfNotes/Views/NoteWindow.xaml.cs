@@ -36,8 +36,6 @@ namespace WpfNotes.Views
             {
                 vm.Change += () =>
                 {
-                    MainWindow mainWindow = new MainWindow();
-                    mainWindow.Show();
                     this.Close();
                 };
             }

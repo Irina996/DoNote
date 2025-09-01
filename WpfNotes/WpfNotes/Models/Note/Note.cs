@@ -6,20 +6,56 @@ using System.Threading.Tasks;
 
 namespace WpfNotes.Models.Note
 {
-    public class Note
+    public class Note : BindableBase
     {
-        public int Id { get; set; }
+        private int _id;
+        private string _title;
+        private string _content;
+        private DateTime _creationDate;
+        private DateTime _changeDate;
+        private bool _isPinned;
+        private Category _category;
 
-        public string Title { get; set; }
+        public int Id
+        {
+            get => _id;
+            set => SetProperty(ref _id, value);
+        }
 
-        public string Content { get; set; }
+        public string Title
+        {
+            get => _title;
+            set => SetProperty(ref _title, value);
+        }
 
-        public DateTime CreationDate { get; set; }
+        public string Content
+        {
+            get => _content;
+            set => SetProperty(ref _content, value);
+        }
 
-        public DateTime ChangeDate { get; set; }
+        public DateTime CreationDate
+        {
+            get => _creationDate;
+            set => SetProperty(ref _creationDate, value);
+        }
 
-        public bool IsPinned { get; set; } = false;
+        public DateTime ChangeDate
+        {
+            get => _changeDate;
+            set => SetProperty(ref _changeDate, value);
+        }
 
-        public Category Category { get; set; }
+        public bool IsPinned
+        {
+            get => _isPinned;
+            set => SetProperty(ref _isPinned, value);
+        }
+
+        public Category Category
+        {
+            get => _category;
+            set => SetProperty(ref _category, value);
+        }
     }
 }
