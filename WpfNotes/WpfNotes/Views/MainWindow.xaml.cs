@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WpfNotes.Models.Note;
 using WpfNotes.ViewModels;
 using WpfNotes.Views;
 
@@ -37,14 +38,15 @@ namespace WpfNotes
                 noteWindow.Show();
                 this.Close();
             };
-            _viewModel.NotesViewModel.OpenCategoryWindowAction += (category) =>
-            {
-                throw new NotImplementedException();
-                /*
-                CategoryWindow categoryWindow = new CategoryWindow(category);
-                categoryWindow.Show();
-                */
-            };
+            _viewModel.NotesViewModel.OpenCategoryWindowAsyncAction += OpenCategoryWindowAsync;
+        }
+
+        private async Task OpenCategoryWindowAsync(Category category, bool isNewCategory)
+        {
+            var categoryWindow = new CategoryWindow(
+                new NoteCategoryViewModel(category, isNewCategory)
+            );
+            categoryWindow.ShowDialog();
         }
 
         private void SearchTextBox_GotFocus(object sender, RoutedEventArgs e)

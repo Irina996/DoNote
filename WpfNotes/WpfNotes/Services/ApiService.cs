@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
+using WpfNotes.ApiModels.Category;
 using WpfNotes.ApiModels.Note;
 using WpfNotes.Models.Note;
 
@@ -120,6 +121,49 @@ namespace WpfNotes.Services
         public async Task<bool> DeleteNoteAsync(Note note)
         {
             var request = new HttpRequestMessage(HttpMethod.Delete, notesRoute + note.Id);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
+
+            var response = await _httpClient.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<Category> CreateNoteCategoryAsync(Category category)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Post, noteCategoriesRoute);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
+            CreateCategoryRequest model = new CreateCategoryRequest { Name = category.Name };
+            request.Content = JsonContent.Create(model);
+
+            var response = await _httpClient.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<Category>();
+            }
+            return null;
+        }
+
+        public async Task<bool> UpdateNoteCategoryAsync(Category category)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Put, noteCategoriesRoute + category.Id);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
+            CreateCategoryRequest model = new CreateCategoryRequest { Name = category.Name };
+            request.Content = JsonContent.Create(model);
+
+            var response = await _httpClient.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<bool> DeleteNoteCategoryAsync(Category category)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Delete, noteCategoriesRoute + category.Id);
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
 
             var response = await _httpClient.SendAsync(request);

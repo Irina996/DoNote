@@ -6,10 +6,18 @@ using System.Threading.Tasks;
 
 namespace WpfNotes.Models.Note
 {
-    public class Category
+    public class Category : BindableBase
     {
         public int Id { get; set; }
 
-        public string Name { get; set; }
+        private string _name;
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                SetProperty(ref _name, value);
+            }
+        }
     }
 }

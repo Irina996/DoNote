@@ -86,7 +86,7 @@ namespace WpfNotes.ViewModels
         public ICommand ChangeSelectedCategoryCommand { get; }
 
         public Action<Note, List<Category>, bool> OpenNoteWindowAction { get; set; }
-        public Action<Category> OpenCategoryWindowAction { get; set; }
+        public Func<Category, bool, Task> OpenCategoryWindowAsyncAction { get; set; }
 
         public NotesListViewModel()
         {
@@ -147,9 +147,17 @@ namespace WpfNotes.ViewModels
             OpenNoteWindowAction?.Invoke(note, categories, isNewNote);
         }
 
-        private void OpenCategoryWindow(Category category)
+        private async Task OpenCategoryWindowAsync(Category category, bool isNewCategory)
         {
-            OpenCategoryWindowAction?.Invoke(category);
+            await OpenCategoryWindowAsyncAction?.Invoke(category, isNewCategory);
+            if (isNewCategory && !string.IsNullOrEmpty(category.Name))
+            {
+                Categories.Add(category);
+            }
+            if (!isNewCategory && string.IsNullOrEmpty(category.Name))
+            {
+                Categories.Remove(category);
+            }
         }
 
         private void CreateNote(object obj)
@@ -165,14 +173,14 @@ namespace WpfNotes.ViewModels
         private void CreateCategory(object obj)
         {
             Category category = new Category();
-            OpenCategoryWindow(category);
+            OpenCategoryWindowAsync(category, true);
         }
 
         private void EditCategory(object obj)
         {
             if (SelectedCategory.Id != 0)
             {
-                OpenCategoryWindow(SelectedCategory);
+                OpenCategoryWindowAsync(SelectedCategory, false);
             }
         }
 
@@ -190,7 +198,11 @@ namespace WpfNotes.ViewModels
 
         private void ChangeCategory(object obj)
         {
-            if (SelectedCategory.Id == 0)
+            if (SelectedCategory == null)
+            {
+                SelectedCategory = Categories[0];
+            }
+            else if (SelectedCategory.Id == 0)
             {
                 // All category
                 _notesModel.GetAllNotes();
