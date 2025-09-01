@@ -12,7 +12,6 @@
     d:DataContext="{d:DesignInstance Type=viewModel:NoteViewModel}"
     FontFamily="{StaticResource Excalifont}"
     FontSize="14"
-    WindowState="Maximized"
     WindowStyle="None"
     mc:Ignorable="d">
     <Grid>

@@ -49,7 +49,7 @@ namespace WpfNotes.ViewModels
             this.isNewNote = isNewNote;
         }
 
-        private void OnNotePropertyChanged(object sender, PropertyChangedEventArgs e)
+        private async void OnNotePropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(Note))
             {
@@ -58,29 +58,29 @@ namespace WpfNotes.ViewModels
             }
         }
 
-        private void SaveNote(object obj)
+        private async void SaveNote(object obj)
         {
             if (Confirm?.Invoke("Save the note?") ?? false)
             {
                 if (isNewNote)
                 {
-                    _noteModel.CreateNote();
+                    await _noteModel.CreateNote();
                     isNewNote = false;
                 }
                 else
                 {
-                    _noteModel.UpdateNote();
+                    await _noteModel.UpdateNote();
                 }
             }
         }
 
-        private void DeleteNote(object obj)
+        private async void DeleteNote(object obj)
         {
             if (Confirm?.Invoke("Delete the note?") ?? false)
             {
                 if (!isNewNote)
                 {
-                    _noteModel.DeleteNote();
+                    await _noteModel.DeleteNote();
                 }
                 CloseWindow();
             }

@@ -15,6 +15,7 @@ namespace WpfNotes.ViewModels
     {
         private NotesListModel _notesModel = new NotesListModel();
 
+        private ObservableCollection<Note> _allNotes;
         private ObservableCollection<Note> _notes;
         private ObservableCollection<Category> _categories;
         private Note _selectedNote;
@@ -22,6 +23,15 @@ namespace WpfNotes.ViewModels
         private string _searchText;
         private bool _isLoading;
 
+        public ObservableCollection<Note> AllNotes 
+        {
+            get => _allNotes;
+            set
+            {
+                _allNotes = value;
+                OnPropertyChanged(nameof(AllNotes));
+            }
+        }
         public ObservableCollection<Note> Notes
         {
             get => _notes;
@@ -85,7 +95,7 @@ namespace WpfNotes.ViewModels
         public ICommand SearchNoteCommand {  get; }
         public ICommand ChangeSelectedCategoryCommand { get; }
 
-        public Action<Note, List<Category>, bool> OpenNoteWindowAction { get; set; }
+        public Func<Note, List<Category>, bool, Task> OpenNoteWindowAction { get; set; }
         public Func<Category, bool, Task> OpenCategoryWindowAsyncAction { get; set; }
 
         public NotesListViewModel()
@@ -97,9 +107,10 @@ namespace WpfNotes.ViewModels
             EditNoteCommand = new ViewModelCommand(EditNote);
             CreateCategoryCommand = new ViewModelCommand(CreateCategory);
             EditCategoryCommand = new ViewModelCommand(EditCategory);
-            SearchNoteCommand = new ViewModelCommand(SearchNote);
-            ChangeSelectedCategoryCommand = new ViewModelCommand(ChangeCategory);
+            SearchNoteCommand = new ViewModelCommand(FilterNotes);
+            ChangeSelectedCategoryCommand = new ViewModelCommand(FilterNotes);
 
+            _allNotes = new ObservableCollection<Note>();
             _notes = new ObservableCollection<Note>();
             _categories = new ObservableCollection<Category>();
             _searchText = "";
@@ -107,7 +118,15 @@ namespace WpfNotes.ViewModels
 
         private void OnNotesModelPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(NotesListModel.Notes))
+            if (e.PropertyName == nameof(NotesListModel.AllNotes))
+            {
+                AllNotes.Clear();
+                foreach (var note in _notesModel.AllNotes)
+                {
+                    AllNotes.Add(note);
+                }
+            }
+            else if (e.PropertyName == nameof(NotesListModel.Notes))
             {
                 Notes.Clear();
                 foreach (var note in _notesModel.Notes)
@@ -140,11 +159,20 @@ namespace WpfNotes.ViewModels
             IsLoading = false;
         }
 
-        private void OpenNoteWindow(Note note, bool isNewNote)
+        private async Task OpenNoteWindow(Note note, bool isNewNote)
         {
             List<Category> categories = new List<Category>(_categories);
             categories.RemoveAt(0); // remove "All" category
-            OpenNoteWindowAction?.Invoke(note, categories, isNewNote);
+            await OpenNoteWindowAction?.Invoke(note, categories, isNewNote);
+            if (isNewNote && !string.IsNullOrEmpty(note.Title))
+            {
+                _notesModel.AddNote(note);
+            }
+            if (!isNewNote && string.IsNullOrEmpty(note.Title))
+            {
+                _notesModel.RemoveNote(note);
+            }
+            FilterNotes(null);
         }
 
         private async Task OpenCategoryWindowAsync(Category category, bool isNewCategory)
@@ -184,32 +212,17 @@ namespace WpfNotes.ViewModels
             }
         }
 
-        private void SearchNote(object obj)
+        private void FilterNotes(object obj)
         {
-            if (string.IsNullOrWhiteSpace(SearchText))
-            {
-                _notesModel.GetAllNotes();
-            }
-            else 
-            { 
-                _notesModel.FindNotes(SearchText);
-            }
-        }
-
-        private void ChangeCategory(object obj)
-        {
-            if (SelectedCategory == null)
-            {
-                SelectedCategory = Categories[0];
-            }
-            else if (SelectedCategory.Id == 0)
+            SelectedCategory ??= Categories[0];
+            if (SelectedCategory.Id == 0)
             {
                 // All category
-                _notesModel.GetAllNotes();
+                _notesModel.FilterNotes(SearchText);
             }
-            else 
-            { 
-                _notesModel.FilterNotes(SelectedCategory); 
+            else
+            {
+                _notesModel.FilterNotes(SearchText, SelectedCategory);
             }
         }
     }

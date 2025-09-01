@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using WpfNotes.Services;
@@ -33,55 +35,66 @@ namespace WpfNotes.Models.Note
 
         public NoteModel(Note note, List<Category> categories) : this()
         {
-            Note = note;
-            if (Note.Category == null)
+            _prevNote = note;
+            if (_prevNote.Category == null)
             {
-                Note.Category = categories[0];
+                _prevNote.Category = categories[0];
             }
             else
             {
-                Note.Category = categories.First(c => c.Id == Note.Category.Id);
+                _prevNote.Category = categories.First(c => c.Id == _prevNote.Category.Id);
             }
             Categories = categories;
             CopyNoteVersion();
         }
 
-        private  void CopyNoteVersion()
+        private void CopyNoteVersion()
         {
-            _prevNote = new Note
+            Note = new Note
             {
-                Id = Note.Id,
-                Title = Note.Title,
-                Content = Note.Content,
-                Category = Note.Category,
-                ChangeDate = Note.ChangeDate,
-                CreationDate = Note.CreationDate,
-                IsPinned = Note.IsPinned
+                Id = _prevNote.Id,
+                Title = _prevNote.Title,
+                Content = _prevNote.Content,
+                Category = _prevNote.Category,
+                ChangeDate = _prevNote.ChangeDate,
+                CreationDate = _prevNote.CreationDate,
+                IsPinned = _prevNote.IsPinned,
             };
         }
 
-        public async void CreateNote()
+        private void UpdatePrevVersion(Note note)
+        {
+            _prevNote.Title = note.Title;
+            _prevNote.Content = note.Content;
+            _prevNote.Category = note.Category;
+            _prevNote.ChangeDate = note.ChangeDate;
+            _prevNote.IsPinned = note.IsPinned;
+        }
+
+        public async Task CreateNote()
         {
             var note = await _apiService.CreateNoteAsync(Note);
-            Note = note;
+            UpdatePrevVersion(note);
             CopyNoteVersion();
         }
 
-        public async void UpdateNote()
+        public async Task UpdateNote()
         {
             await _apiService.UpdateNoteAsync(Note);
+            UpdatePrevVersion(Note);
             CopyNoteVersion();
         }
 
-        public async void DeleteNote()
+        public async Task DeleteNote()
         {
             await _apiService.DeleteNoteAsync(Note);
+            _prevNote.Title = null;
+            _prevNote.Content = null;
             Note = null;
         }
 
         public void CancelChanges()
         {
-            Note = _prevNote;
             CopyNoteVersion();
         }
     }

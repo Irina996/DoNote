@@ -16,6 +16,14 @@ namespace WpfNotes.Models.Note
         private List<Note> _notes = new List<Note>();
         private List<Category> _allCategories = new List<Category>();
 
+        public List<Note> AllNotes
+        {
+            get => _allNotes; 
+            set 
+            { 
+                SetProperty(ref _allNotes, value);
+            }
+        }
         public List<Note> Notes
         {
             get => _notes;
@@ -55,21 +63,33 @@ namespace WpfNotes.Models.Note
             }
         }
 
-        public void FindNotes(string text)
+        public void AddNote(Note note)
         {
-            Notes = _allNotes
-                .Where(n => n.Title.ToLower().IndexOf(text.ToLower()) > -1 
-                    || n.Content.ToLower().IndexOf(text.ToLower()) > -1)
-                .OrderByDescending(n => n.ChangeDate)
-                .ToList();
+            AllNotes.Insert(0, note);
         }
 
-        public void FilterNotes(Category category)
+        public void RemoveNote(Note note)
         {
-            Notes = _allNotes
-                .Where(n => n.Category.Id == category.Id)
-                .OrderByDescending(n => n.ChangeDate)
-                .ToList();
+            AllNotes.Remove(note);
+        }
+
+        public void FilterNotes(string text = null, Category category = null)
+        {
+            IEnumerable<Note> filteredByText = AllNotes;
+            if (!string.IsNullOrEmpty(text))
+            {
+                filteredByText = AllNotes.Where(n => n.Title.ToLower().IndexOf(text.ToLower()) > -1
+                    || n.Content.ToLower().IndexOf(text.ToLower()) > -1)
+                    .OrderByDescending(n => n.ChangeDate);
+            }
+            IEnumerable<Note> filteredByCategory = AllNotes;
+            if (category != null)
+            {
+                filteredByCategory = AllNotes
+                    .Where(n => n.Category.Id == category.Id)
+                    .OrderByDescending(n => n.ChangeDate);
+            }
+            Notes = filteredByText.Intersect(filteredByCategory).ToList();
         }
 
         public void GetAllNotes()

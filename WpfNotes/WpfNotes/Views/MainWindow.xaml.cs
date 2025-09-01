@@ -32,13 +32,14 @@ namespace WpfNotes
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            _viewModel.NotesViewModel.OpenNoteWindowAction += (note, categories, isNewNote) =>
-            {
-                NoteWindow noteWindow = new NoteWindow(note, categories, isNewNote);
-                noteWindow.Show();
-                this.Close();
-            };
+            _viewModel.NotesViewModel.OpenNoteWindowAction += OpenNoteWindowAsync;
             _viewModel.NotesViewModel.OpenCategoryWindowAsyncAction += OpenCategoryWindowAsync;
+        }
+
+        private async Task OpenNoteWindowAsync(Note note, List<Category> categories, bool isNewNote)
+        {
+            NoteWindow noteWindow = new NoteWindow(note, categories, isNewNote);
+            noteWindow.ShowDialog();
         }
 
         private async Task OpenCategoryWindowAsync(Category category, bool isNewCategory)
