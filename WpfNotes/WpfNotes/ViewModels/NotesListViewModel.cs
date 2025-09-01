@@ -141,7 +141,7 @@ namespace WpfNotes.ViewModels
             {
                 _categories.Clear();
                 // add "All" category
-                _categories.Add(new Category {Id = 0, Name = "All"});
+                _categories.Add(new Category {Id = -1, Name = "All"});
                 _selectedCategory = Categories[0];
                 foreach (var category in _notesModel.Categories)
                 {
@@ -206,7 +206,7 @@ namespace WpfNotes.ViewModels
 
         private void EditCategory(object obj)
         {
-            if (SelectedCategory.Id != 0)
+            if (SelectedCategory.Id != -1)
             {
                 OpenCategoryWindowAsync(SelectedCategory, false);
             }
@@ -215,7 +215,7 @@ namespace WpfNotes.ViewModels
         private void FilterNotes(object obj)
         {
             SelectedCategory ??= Categories[0];
-            if (SelectedCategory.Id == 0)
+            if (SelectedCategory.Id == -1)
             {
                 // All category
                 _notesModel.FilterNotes(SearchText);

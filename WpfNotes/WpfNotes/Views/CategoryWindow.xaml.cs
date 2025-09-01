@@ -22,8 +22,8 @@ namespace WpfNotes.Views
     {
         public CategoryWindow(CategoryViewModel viewModel)
         {
-            InitializeComponent();
             DataContext = viewModel;
+            InitializeComponent();
 
             Loaded += CategoryWindow_Loaded;
         }
@@ -34,8 +34,6 @@ namespace WpfNotes.Views
             {
                 vm.Change += () =>
                 {
-                    /*MainWindow mainWindow = new MainWindow();
-                    mainWindow.Show();*/
                     this.Close();
                 };
             }
