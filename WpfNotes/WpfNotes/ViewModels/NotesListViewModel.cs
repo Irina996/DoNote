@@ -11,7 +11,7 @@ using WpfNotes.Models.Note;
 
 namespace WpfNotes.ViewModels
 {
-    public class NotesListViewModel : ViewModelBase
+    public class NotesListViewModel : ViewModelBase, IWindowService
     {
         private NotesListModel _notesModel = new NotesListModel();
 
@@ -95,13 +95,14 @@ namespace WpfNotes.ViewModels
         public ICommand SearchNoteCommand {  get; }
         public ICommand ChangeSelectedCategoryCommand { get; }
 
-        public Func<Note, List<Category>, bool, Task> OpenNoteWindowAction { get; set; }
-        public Func<Category, bool, Task> OpenCategoryWindowAsyncAction { get; set; }
+        public Func<Note, List<Category>, bool, Task> OpenItemWindowAsyncFunc { get; set; }
+        public Func<Category, bool, Task> OpenCategoryWindowAsyncFunc { get; set; }
 
         public NotesListViewModel()
         {
             _notesModel.PropertyChanged += OnNotesModelPropertyChanged;
 
+            LoadData(null);
             LoadCommand = new ViewModelCommand(LoadData);
             CreateNoteCommand = new ViewModelCommand(CreateNote);
             EditNoteCommand = new ViewModelCommand(EditNote);
@@ -163,7 +164,7 @@ namespace WpfNotes.ViewModels
         {
             List<Category> categories = new List<Category>(_categories);
             categories.RemoveAt(0); // remove "All" category
-            await OpenNoteWindowAction?.Invoke(note, categories, isNewNote);
+            await OpenItemWindowAsyncFunc?.Invoke(note, categories, isNewNote);
             if (isNewNote && !string.IsNullOrEmpty(note.Title))
             {
                 _notesModel.AddNote(note);
@@ -177,7 +178,7 @@ namespace WpfNotes.ViewModels
 
         private async Task OpenCategoryWindowAsync(Category category, bool isNewCategory)
         {
-            await OpenCategoryWindowAsyncAction?.Invoke(category, isNewCategory);
+            await OpenCategoryWindowAsyncFunc?.Invoke(category, isNewCategory);
             if (isNewCategory && !string.IsNullOrEmpty(category.Name))
             {
                 Categories.Add(category);
