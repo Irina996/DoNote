@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using WpfNotes.ApiModels.Category;
 using WpfNotes.ApiModels.Note;
 using WpfNotes.Models.Note;
+using WpfNotes.Models.TaskItem;
 
 namespace WpfNotes.Services
 {
@@ -173,5 +174,32 @@ namespace WpfNotes.Services
             }
             return false;
         }
+
+        public async Task<List<TaskItem>> GetTaskItemsAsync()
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, tasksRoute);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
+
+            var response = await _httpClient.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<List<TaskItem>>();
+            }
+            return new List<TaskItem>();
+        }
+
+        public async Task<List<TaskCategory>> GetTaskCategoriesAsync()
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, taskCategoriesRoute);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
+
+            var response = await _httpClient.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<List<TaskCategory>>();
+            }
+            return new List<TaskCategory>();
+        }
+    
     }
 }

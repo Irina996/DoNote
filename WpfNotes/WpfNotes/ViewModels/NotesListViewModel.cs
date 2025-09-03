@@ -11,7 +11,7 @@ using WpfNotes.Models.Note;
 
 namespace WpfNotes.ViewModels
 {
-    public class NotesListViewModel : ViewModelBase, IWindowService
+    public class NotesListViewModel : ViewModelBase, IWindowService<Note, Category>
     {
         private NotesListModel _notesModel = new NotesListModel();
 

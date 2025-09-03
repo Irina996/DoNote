@@ -12,45 +12,40 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using WpfNotes.Models.Note;
+using WpfNotes.Models.TaskItem;
 using WpfNotes.ViewModels;
 
 namespace WpfNotes.Views
 {
     /// <summary>
-    /// Логика взаимодействия для NotesView.xaml
+    /// Логика взаимодействия для TasksView.xaml
     /// </summary>
-    public partial class NotesView : UserControl
+    public partial class TasksView : UserControl
     {
-
-        public NotesView()
+        public TasksView()
         {
             InitializeComponent();
 
-            Loaded += NotesView_Loaded;
+            Loaded += TasksView_Loaded;
         }
 
-        private void NotesView_Loaded(object sender, RoutedEventArgs e)
+        private void TasksView_Loaded(object sender, RoutedEventArgs e)
         {
-            if (DataContext is IWindowService<Note, Category> windowService)
+            if (DataContext is IWindowService<TaskItem, TaskCategory> windowService)
             {
-                windowService.OpenItemWindowAsyncFunc += OpenNoteWindowAsync;
+                windowService.OpenItemWindowAsyncFunc += OpenTaskWindowAsync;
                 windowService.OpenCategoryWindowAsyncFunc += OpenCategoryWindowAsync;
             }
         }
 
-        private async Task OpenNoteWindowAsync(Note note, List<Category> categories, bool isNewNote)
+        private Task OpenTaskWindowAsync(TaskItem task, List<TaskCategory> categories, bool isNewTask)
         {
-            NoteWindow noteWindow = new NoteWindow(note, categories, isNewNote);
-            noteWindow.ShowDialog();
+            throw new NotImplementedException();
         }
 
-        private async Task OpenCategoryWindowAsync(Category category, bool isNewCategory)
+        private Task OpenCategoryWindowAsync(TaskCategory category, bool isNewCategory)
         {
-            var categoryWindow = new CategoryWindow(
-                new NoteCategoryViewModel(category, isNewCategory)
-            );
-            categoryWindow.ShowDialog();
+            throw new NotImplementedException();
         }
 
         private void SearchTextBox_GotFocus(object sender, RoutedEventArgs e)
