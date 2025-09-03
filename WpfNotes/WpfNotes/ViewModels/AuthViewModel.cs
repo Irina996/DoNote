@@ -118,7 +118,7 @@ namespace WpfNotes.ViewModels
 
         private bool CanExecuteRegisterCommand(object obj)
         {
-            if (!string.IsNullOrWhiteSpace(Email))
+            if (string.IsNullOrWhiteSpace(Email))
             {
                 ErrorMessage = "Email is required";
                 return false;
