@@ -201,5 +201,47 @@ namespace WpfNotes.Services
             return new List<TaskCategory>();
         }
     
+        public async Task<TaskCategory> CreateTaskCategoryAsync(TaskCategory category)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Post, taskCategoriesRoute);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
+            CreateCategoryRequest model = new CreateCategoryRequest { Name = category.Name };
+            request.Content = JsonContent.Create(model);
+
+            var response = await _httpClient.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<TaskCategory>();
+            }
+            return null;
+        }
+
+        public async Task<bool> UpdateTaskCategoryAsync(TaskCategory category)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Put, noteCategoriesRoute + category.Id);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
+            CreateCategoryRequest model = new CreateCategoryRequest { Name = category.Name };
+            request.Content = JsonContent.Create(model);
+
+            var response = await _httpClient.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<bool> DeleteTaskCategoryAsync(TaskCategory category)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Delete, noteCategoriesRoute + category.Id);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
+
+            var response = await _httpClient.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }

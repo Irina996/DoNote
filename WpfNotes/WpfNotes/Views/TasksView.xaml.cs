@@ -38,14 +38,17 @@ namespace WpfNotes.Views
             }
         }
 
-        private Task OpenTaskWindowAsync(TaskItem task, List<TaskCategory> categories, bool isNewTask)
+        private async Task OpenTaskWindowAsync(TaskItem task, List<TaskCategory> categories, bool isNewTask)
         {
             throw new NotImplementedException();
         }
 
-        private Task OpenCategoryWindowAsync(TaskCategory category, bool isNewCategory)
+        private async Task OpenCategoryWindowAsync(TaskCategory category, bool isNewCategory)
         {
-            throw new NotImplementedException();
+            var categoryWindow = new CategoryWindow(
+                new TaskCategoryViewModel(category, isNewCategory)
+            );
+            categoryWindow.ShowDialog();
         }
 
         private void SearchTextBox_GotFocus(object sender, RoutedEventArgs e)

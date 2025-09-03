@@ -7,9 +7,9 @@ using WpfNotes.Models.Note;
 
 namespace WpfNotes.ViewModels
 {
-    interface IWindowService<T, K>
+    interface IWindowService
     {
-        public Func<T, List<K>, bool, Task> OpenItemWindowAsyncFunc { get; set; }
-        public Func<K, bool, Task> OpenCategoryWindowAsyncFunc { get; set; }
+        public Func<Note, List<Category>, bool, Task> OpenItemWindowAsyncFunc { get; set; }
+        public Func<Category, bool, Task> OpenCategoryWindowAsyncFunc { get; set; }
     }
 }
