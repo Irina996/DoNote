@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:WpfNotes.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     Title="TaskWindow"
     Width="800"
     Height="450"
@@ -83,14 +84,12 @@
             DisplayMemberPath="Name"
             ItemsSource="{Binding Categories}"
             SelectedItem="{Binding TaskItem.Category}" />
-        <Button
+        <xctk:DateTimePicker
             Grid.Row="3"
             Grid.Column="1"
             Margin="10"
             Padding="10"
-            Background="White"
-            Command="{Binding NotificationCommand}"
-            Content="Set notification" />
+            Value="{Binding TaskItem.Notification}" />
         <Button
             Grid.Row="3"
             Grid.Column="2"

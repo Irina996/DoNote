@@ -209,7 +209,7 @@ namespace WpfNotes.Services
             CreateTaskRequest model = new CreateTaskRequest
             {
                 Content = task.Content,
-                Notification = task.Notification,
+                Notification = task.Notification?.ToUniversalTime(),
                 CategoryId = task.Category.Id,
             };
             request.Content = JsonContent.Create(model);

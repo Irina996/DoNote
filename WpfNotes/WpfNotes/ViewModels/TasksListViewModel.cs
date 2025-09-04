@@ -188,7 +188,16 @@ namespace WpfNotes.ViewModels
 
         private void CreateTask(object obj)
         {
-            OpenTaskWindow(new TaskItem() { Category = SelectedCategory }, true);
+            var task = new TaskItem();
+            if (SelectedCategory.Id == -1)
+            {
+                task.Category = Categories[1];
+            }
+            else
+            {
+                task.Category = SelectedCategory;
+            }
+            OpenTaskWindow(task, true);
         }
 
         private void EditTask(object obj)
