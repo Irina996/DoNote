@@ -8,12 +8,14 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using WpfNotes.Models.Note;
+using WpfNotes.Services;
 
 namespace WpfNotes.ViewModels
 {
     public class NotesListViewModel : ViewModelBase
     {
-        private NotesListModel _notesModel = new NotesListModel();
+        private readonly NotesListModel _notesModel;
+        private readonly IWindowService _windowService;
 
         private ObservableCollection<Note> _allNotes;
         private ObservableCollection<Note> _notes;
@@ -95,13 +97,14 @@ namespace WpfNotes.ViewModels
         public ICommand SearchNoteCommand {  get; }
         public ICommand ChangeSelectedCategoryCommand { get; }
 
-        public Func<Note, List<Category>, bool, Task> OpenNoteWindowAction { get; set; }
-        public Func<Category, bool, Task> OpenCategoryWindowAsyncAction { get; set; }
-
         public NotesListViewModel()
         {
+            _notesModel = new NotesListModel();
             _notesModel.PropertyChanged += OnNotesModelPropertyChanged;
 
+            _windowService = new WindowService();
+
+            LoadData(null);
             LoadCommand = new ViewModelCommand(LoadData);
             CreateNoteCommand = new ViewModelCommand(CreateNote);
             EditNoteCommand = new ViewModelCommand(EditNote);
@@ -141,7 +144,7 @@ namespace WpfNotes.ViewModels
             {
                 _categories.Clear();
                 // add "All" category
-                _categories.Add(new Category {Id = 0, Name = "All"});
+                _categories.Add(new Category {Id = -1, Name = "All"});
                 _selectedCategory = Categories[0];
                 foreach (var category in _notesModel.Categories)
                 {
@@ -163,7 +166,7 @@ namespace WpfNotes.ViewModels
         {
             List<Category> categories = new List<Category>(_categories);
             categories.RemoveAt(0); // remove "All" category
-            await OpenNoteWindowAction?.Invoke(note, categories, isNewNote);
+            _windowService.ShowNoteWindow(new NoteViewModel(note, categories, isNewNote));
             if (isNewNote && !string.IsNullOrEmpty(note.Title))
             {
                 _notesModel.AddNote(note);
@@ -177,7 +180,7 @@ namespace WpfNotes.ViewModels
 
         private async Task OpenCategoryWindowAsync(Category category, bool isNewCategory)
         {
-            await OpenCategoryWindowAsyncAction?.Invoke(category, isNewCategory);
+            _windowService.ShowCategoryWindow(new NoteCategoryViewModel(category, isNewCategory));
             if (isNewCategory && !string.IsNullOrEmpty(category.Name))
             {
                 Categories.Add(category);
@@ -190,7 +193,16 @@ namespace WpfNotes.ViewModels
 
         private void CreateNote(object obj)
         {
-            OpenNoteWindow(new Note(), true);
+            var note = new Note();
+            if (SelectedCategory.Id == -1)
+            {
+                note.Category = Categories[1];
+            }
+            else
+            {
+                note.Category = SelectedCategory;
+            }
+            OpenNoteWindow(note, true);
         }
 
         private void EditNote(object obj)
@@ -206,7 +218,7 @@ namespace WpfNotes.ViewModels
 
         private void EditCategory(object obj)
         {
-            if (SelectedCategory.Id != 0)
+            if (SelectedCategory.Id != -1)
             {
                 OpenCategoryWindowAsync(SelectedCategory, false);
             }
@@ -215,7 +227,7 @@ namespace WpfNotes.ViewModels
         private void FilterNotes(object obj)
         {
             SelectedCategory ??= Categories[0];
-            if (SelectedCategory.Id == 0)
+            if (SelectedCategory.Id == -1)
             {
                 // All category
                 _notesModel.FilterNotes(SearchText);

@@ -19,51 +19,9 @@ namespace WpfNotes
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly MainViewModel _viewModel;
-
         public MainWindow()
         {
             InitializeComponent();
-            _viewModel = new MainViewModel();
-            DataContext = _viewModel;
-
-            Loaded += MainWindow_Loaded;
-        }
-
-        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
-        {
-            _viewModel.NotesViewModel.OpenNoteWindowAction += OpenNoteWindowAsync;
-            _viewModel.NotesViewModel.OpenCategoryWindowAsyncAction += OpenCategoryWindowAsync;
-        }
-
-        private async Task OpenNoteWindowAsync(Note note, List<Category> categories, bool isNewNote)
-        {
-            NoteWindow noteWindow = new NoteWindow(note, categories, isNewNote);
-            noteWindow.ShowDialog();
-        }
-
-        private async Task OpenCategoryWindowAsync(Category category, bool isNewCategory)
-        {
-            var categoryWindow = new CategoryWindow(
-                new NoteCategoryViewModel(category, isNewCategory)
-            );
-            categoryWindow.ShowDialog();
-        }
-
-        private void SearchTextBox_GotFocus(object sender, RoutedEventArgs e)
-        {
-            if (string.IsNullOrEmpty(SearchTextBox.Text))
-            {
-                HintSearchTextBlock.Visibility = Visibility.Collapsed;
-            }
-        }
-
-        private void SearchTextBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            if (string.IsNullOrEmpty(SearchTextBox.Text))
-            {
-                HintSearchTextBlock.Visibility = Visibility.Visible;
-            }
         }
     }
 }

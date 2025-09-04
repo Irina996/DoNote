@@ -22,8 +22,8 @@ namespace WpfNotes.Views
     {
         public CategoryWindow(CategoryViewModel viewModel)
         {
-            InitializeComponent();
             DataContext = viewModel;
+            InitializeComponent();
 
             Loaded += CategoryWindow_Loaded;
         }
@@ -34,20 +34,10 @@ namespace WpfNotes.Views
             {
                 vm.Change += () =>
                 {
-                    /*MainWindow mainWindow = new MainWindow();
-                    mainWindow.Show();*/
                     this.Close();
                 };
             }
-            if (DataContext is IConfirm m)
-            {
-                m.Confirm += message =>
-                {
-                    var result = MessageBox.Show(message, "Confirmation", MessageBoxButton.YesNo);
-
-                    return result == MessageBoxResult.Yes;
-                };
-            }
+            
             if (!string.IsNullOrEmpty(CategoryTextBox.Text))
             {
                 CategoryHintBox.Visibility = Visibility.Collapsed;

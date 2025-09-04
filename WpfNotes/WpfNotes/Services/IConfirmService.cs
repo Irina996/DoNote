@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WpfNotes.ViewModels
+namespace WpfNotes.Services
 {
-    interface IConfirm
+    public interface IConfirmService
     {
-        Predicate<string> Confirm { get; set; }
+        bool ShowConfirmation(string title, string message);
     }
 }

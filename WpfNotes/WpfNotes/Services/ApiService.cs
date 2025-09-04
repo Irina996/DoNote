@@ -8,7 +8,9 @@ using System.Text;
 using System.Threading.Tasks;
 using WpfNotes.ApiModels.Category;
 using WpfNotes.ApiModels.Note;
+using WpfNotes.ApiModels.TaskItem;
 using WpfNotes.Models.Note;
+using WpfNotes.Models.TaskItem;
 
 namespace WpfNotes.Services
 {
@@ -162,6 +164,129 @@ namespace WpfNotes.Services
         }
 
         public async Task<bool> DeleteNoteCategoryAsync(Category category)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Delete, noteCategoriesRoute + category.Id);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
+
+            var response = await _httpClient.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<List<TaskItem>> GetTaskItemsAsync()
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, tasksRoute);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
+
+            var response = await _httpClient.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<List<TaskItem>>();
+            }
+            return new List<TaskItem>();
+        }
+
+        public async Task<List<TaskCategory>> GetTaskCategoriesAsync()
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, taskCategoriesRoute);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
+
+            var response = await _httpClient.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<List<TaskCategory>>();
+            }
+            return new List<TaskCategory>();
+        }
+
+        public async Task<TaskItem> CreateTaskAsync(TaskItem task)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Post, tasksRoute);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
+            CreateTaskRequest model = new CreateTaskRequest
+            {
+                Content = task.Content,
+                Notification = task.Notification?.ToUniversalTime(),
+                CategoryId = task.Category.Id,
+            };
+            request.Content = JsonContent.Create(model);
+
+            var response = await _httpClient.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<TaskItem>();
+            }
+            return null;
+        }
+
+        public async Task<bool> UpdateTaskAsync(TaskItem task)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Put, tasksRoute + task.Id);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
+            UpdateTaskRequest model = new UpdateTaskRequest
+            {
+                Content = task.Content,
+                IsCompleted = task.IsCompleted,
+                Notification = task.Notification,
+                CategoryId = task.Category.Id,
+            };
+            request.Content = JsonContent.Create(model);
+
+            var response = await _httpClient.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<bool> DeleteTaskAsync(TaskItem task)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Delete, tasksRoute + task.Id);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
+
+            var response = await _httpClient.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<TaskCategory> CreateTaskCategoryAsync(TaskCategory category)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Post, taskCategoriesRoute);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
+            CreateCategoryRequest model = new CreateCategoryRequest { Name = category.Name };
+            request.Content = JsonContent.Create(model);
+
+            var response = await _httpClient.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<TaskCategory>();
+            }
+            return null;
+        }
+
+        public async Task<bool> UpdateTaskCategoryAsync(TaskCategory category)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Put, noteCategoriesRoute + category.Id);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
+            CreateCategoryRequest model = new CreateCategoryRequest { Name = category.Name };
+            request.Content = JsonContent.Create(model);
+
+            var response = await _httpClient.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<bool> DeleteTaskCategoryAsync(TaskCategory category)
         {
             var request = new HttpRequestMessage(HttpMethod.Delete, noteCategoriesRoute + category.Id);
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);

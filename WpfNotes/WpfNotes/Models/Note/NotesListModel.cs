@@ -78,18 +78,19 @@ namespace WpfNotes.Models.Note
             IEnumerable<Note> filteredByText = AllNotes;
             if (!string.IsNullOrEmpty(text))
             {
-                filteredByText = AllNotes.Where(n => n.Title.ToLower().IndexOf(text.ToLower()) > -1
-                    || n.Content.ToLower().IndexOf(text.ToLower()) > -1)
-                    .OrderByDescending(n => n.ChangeDate);
+                filteredByText = AllNotes
+                    .Where(n => n.Title.ToLower().IndexOf(text.ToLower()) > -1
+                    || n.Content.ToLower().IndexOf(text.ToLower()) > -1);
             }
             IEnumerable<Note> filteredByCategory = AllNotes;
             if (category != null)
             {
                 filteredByCategory = AllNotes
-                    .Where(n => n.Category.Id == category.Id)
-                    .OrderByDescending(n => n.ChangeDate);
+                    .Where(n => n.Category.Id == category.Id);
             }
-            Notes = filteredByText.Intersect(filteredByCategory).ToList();
+            Notes = filteredByText.Intersect(filteredByCategory)
+                .OrderByDescending(n => n.ChangeDate)
+                .ToList();
         }
 
         public void GetAllNotes()

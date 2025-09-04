@@ -1,24 +1,27 @@
 ﻿using System.ComponentModel;
-using WpfNotes.Models.Note;
+using WpfNotes.Models.TaskItem;
 
 namespace WpfNotes.ViewModels
 {
-    public class NoteCategoryViewModel : CategoryViewModel
+    public class TaskCategoryViewModel : CategoryViewModel
     {
-        private readonly NoteCategoryModel _model;
+        private readonly TaskCategoryModel _model;
 
-        private Category _category;
+        private TaskCategory _category;
 
-        public Category Category 
-        { 
-            get => _category; 
-            set { _category = value; OnPropertyChanged(nameof(Category)); } 
+        public TaskCategory Category
+        {
+            get => _category;
+            set
+            {
+                _category = value;
+                OnPropertyChanged(nameof(Category));
+            }
         }
 
-        public NoteCategoryViewModel(Category category, bool isEmptyCategory) : base(isEmptyCategory)  
+        public TaskCategoryViewModel(TaskCategory category, bool isEmptyCategory) : base(isEmptyCategory) 
         {
-
-            _model = new NoteCategoryModel(category);
+            _model = new TaskCategoryModel(category);
             _model.PropertyChanged += OnModelPropertyChanged;
             Category = _model.Category;
         }

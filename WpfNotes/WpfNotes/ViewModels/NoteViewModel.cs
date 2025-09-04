@@ -7,12 +7,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using WpfNotes.Models.Note;
+using WpfNotes.Services;
 
 namespace WpfNotes.ViewModels
 {
-    public class NoteViewModel : ViewModelBase, IChangeWindows, IConfirm
+    public class NoteViewModel : ViewModelBase, IChangeWindows
     {
-        private NoteModel _noteModel;
+        private readonly NoteModel _noteModel;
+        private readonly IConfirmService _confirmService;
 
         private bool isNewNote;
         private Note _note;
@@ -33,7 +35,6 @@ namespace WpfNotes.ViewModels
         public ICommand BackCommand { get; }
 
         public Action Change { get; set; }
-        public Predicate<string> Confirm { get; set; }
 
         public NoteViewModel(Note note, List<Category> categories, bool isNewNote)
         {
@@ -41,6 +42,8 @@ namespace WpfNotes.ViewModels
             _noteModel.PropertyChanged += OnNotePropertyChanged;
             _categories = new ObservableCollection<Category>(_noteModel.Categories);
             _note = _noteModel.Note;
+
+            _confirmService = new ConfirmService();
 
             SaveCommand = new ViewModelCommand(SaveNote);
             DeleteCommand = new ViewModelCommand(DeleteNote);
@@ -60,7 +63,7 @@ namespace WpfNotes.ViewModels
 
         private async void SaveNote(object obj)
         {
-            if (Confirm?.Invoke("Save the note?") ?? false)
+            if (_confirmService.ShowConfirmation("Confirm", "Save the note?"))
             {
                 if (isNewNote)
                 {
@@ -76,7 +79,7 @@ namespace WpfNotes.ViewModels
 
         private async void DeleteNote(object obj)
         {
-            if (Confirm?.Invoke("Delete the note?") ?? false)
+            if (_confirmService.ShowConfirmation("Confirm", "Delete the note?"))
             {
                 if (!isNewNote)
                 {
@@ -88,7 +91,7 @@ namespace WpfNotes.ViewModels
 
         private void Cancel(object obj)
         {
-            if (Confirm?.Invoke("Cancel?") ?? false)
+            if (_confirmService.ShowConfirmation("Confirm", "Cancel?"))
             {
                 _noteModel.CancelChanges();
             }

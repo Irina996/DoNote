@@ -61,7 +61,7 @@ namespace WpfNotes {
         private void ConfirmPasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
         {
             if (this.DataContext != null)
-            { ((dynamic)this.DataContext).Password = ((PasswordBox)sender).Password; }
+            { ((dynamic)this.DataContext).ConfirmPassword = ((PasswordBox)sender).Password; }
         }
     }
 }
