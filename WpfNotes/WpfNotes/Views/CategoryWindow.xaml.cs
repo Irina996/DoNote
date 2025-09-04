@@ -37,15 +37,7 @@ namespace WpfNotes.Views
                     this.Close();
                 };
             }
-            if (DataContext is IConfirm m)
-            {
-                m.Confirm += message =>
-                {
-                    var result = MessageBox.Show(message, "Confirmation", MessageBoxButton.YesNo);
-
-                    return result == MessageBoxResult.Yes;
-                };
-            }
+            
             if (!string.IsNullOrEmpty(CategoryTextBox.Text))
             {
                 CategoryHintBox.Visibility = Visibility.Collapsed;

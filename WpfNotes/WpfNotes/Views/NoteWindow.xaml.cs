@@ -22,10 +22,10 @@ namespace WpfNotes.Views
     public partial class NoteWindow : Window
     {
         private readonly NoteViewModel _viewModel;
-        public NoteWindow(Note note, List<Category> categories, bool isNewNote)
+        public NoteWindow(NoteViewModel viewModel)
         {
             InitializeComponent();
-            _viewModel = new NoteViewModel(note, categories, isNewNote);
+            _viewModel = viewModel;
             DataContext = _viewModel;
             Loaded += NoteWindow_Loaded;
         }
@@ -39,15 +39,7 @@ namespace WpfNotes.Views
                     this.Close();
                 };
             }
-            if (DataContext is IConfirm m)
-            {
-                m.Confirm += message =>
-                {
-                    var result = MessageBox.Show(message, "Confirmation", MessageBoxButton.YesNo);
-
-                    return result == MessageBoxResult.Yes;
-                };
-            }
+            
             if (!string.IsNullOrEmpty(NoteTitleTextBox.Text))
             {
                 HintNoteTitleTextBlock.Visibility = Visibility.Collapsed;
@@ -56,7 +48,6 @@ namespace WpfNotes.Views
             {
                 HintNoteContentTextBlock.Visibility = Visibility.Collapsed;
             }
-            Console.WriteLine(categoryComboBox.SelectedItem);
         }
 
         private void NoteTitleBox_GotFocus(object sender, RoutedEventArgs e)

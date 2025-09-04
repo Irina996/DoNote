@@ -6,12 +6,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using WpfNotes.Models.TaskItem;
+using WpfNotes.Services;
 
 namespace WpfNotes.ViewModels
 {
-    public class TaskCategoryViewModel : CategoryViewModel, IChangeWindows, IConfirm
+    public class TaskCategoryViewModel : CategoryViewModel, IChangeWindows
     {
         private readonly TaskCategoryModel _model;
+        private readonly IConfirmService _confirmService;
 
         private TaskCategory _category;
         private bool isNewCategory;
@@ -30,7 +32,6 @@ namespace WpfNotes.ViewModels
         public ICommand CancelCommand { get; }
         public ICommand SaveCommand { get; }
         public Action Change { get; set; }
-        public Predicate<string> Confirm { get; set; }
 
         public TaskCategoryViewModel(TaskCategory category, bool isEmptyCategory)
         {
@@ -38,6 +39,8 @@ namespace WpfNotes.ViewModels
             _model.PropertyChanged += OnModelPropertyChanged;
             Category = _model.Category;
             isNewCategory = isEmptyCategory;
+
+            _confirmService = new ConfirmService();
 
             DeleteCommand = new ViewModelCommand(DeleteCategory);
             CancelCommand = new ViewModelCommand(CancelChanges);
@@ -54,7 +57,7 @@ namespace WpfNotes.ViewModels
 
         private async void DeleteCategory(object obj)
         {
-            if (Confirm?.Invoke("Delete category") ?? false)
+            if (_confirmService.ShowConfirmation("Confirm", "Delete category"))
             {
                 await _model.DeleteCategory();
                 CloseWindow();

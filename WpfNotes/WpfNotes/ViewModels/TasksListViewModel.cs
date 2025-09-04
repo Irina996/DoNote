@@ -6,12 +6,14 @@ using System.Linq;
 using System.Text;
 using System.Windows.Input;
 using WpfNotes.Models.TaskItem;
+using WpfNotes.Services;
 
 namespace WpfNotes.ViewModels
 {
-    public class TasksListViewModel : ViewModelBase, IWindowService<TaskItem, TaskCategory>
+    public class TasksListViewModel : ViewModelBase
     {
-        private readonly TasksListModel _tasksModel = new TasksListModel();
+        private readonly IWindowService _windowService;
+        private readonly TasksListModel _tasksModel;
 
         private ObservableCollection<TaskItem> _allTasks;
         private ObservableCollection<TaskItem> _tasks;
@@ -85,9 +87,6 @@ namespace WpfNotes.ViewModels
             } 
         }
 
-        public Func<TaskItem, List<TaskCategory>, bool, Task> OpenItemWindowAsyncFunc { get; set; }
-        public Func<TaskCategory, bool, Task> OpenCategoryWindowAsyncFunc { get; set; }
-
         public ICommand LoadCommand { get; }
         public ICommand CreateTaskCommand { get; }
         public ICommand EditTaskCommand { get; }
@@ -98,6 +97,8 @@ namespace WpfNotes.ViewModels
 
         public TasksListViewModel()
         {
+            _windowService = new WindowService();
+            _tasksModel = new TasksListModel();
             _tasksModel.PropertyChanged += OnTasksModelPropertyChanged;
 
             LoadData(null);
@@ -160,7 +161,8 @@ namespace WpfNotes.ViewModels
         {
             List<TaskCategory> categories = new List<TaskCategory>(_categories);
             categories.RemoveAt(0); // remove "All" category
-            await OpenItemWindowAsyncFunc?.Invoke(task, categories, isNewTask);
+            // TODO: open task window
+            //_windowService.ShowTaskWindow(new TaskViewMode(task, categories, isNewTask));
             if (isNewTask && !string.IsNullOrEmpty(task.Content))
             {
                 _tasksModel.AddTask(task);
@@ -174,7 +176,7 @@ namespace WpfNotes.ViewModels
 
         private async Task OpenCategoryWindowAsync(TaskCategory category, bool isNewCategory)
         {
-            await OpenCategoryWindowAsyncFunc?.Invoke(category, isNewCategory);
+            _windowService.ShowCategoryWindow(new TaskCategoryViewModel(category, isNewCategory));
             if (isNewCategory && !string.IsNullOrEmpty(category.Name))
             {
                 Categories.Add(category);

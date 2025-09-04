@@ -8,12 +8,14 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using WpfNotes.Models.Note;
+using WpfNotes.Services;
 
 namespace WpfNotes.ViewModels
 {
-    public class NotesListViewModel : ViewModelBase, IWindowService<Note, Category>
+    public class NotesListViewModel : ViewModelBase
     {
-        private NotesListModel _notesModel = new NotesListModel();
+        private readonly NotesListModel _notesModel;
+        private readonly IWindowService _windowService;
 
         private ObservableCollection<Note> _allNotes;
         private ObservableCollection<Note> _notes;
@@ -95,12 +97,12 @@ namespace WpfNotes.ViewModels
         public ICommand SearchNoteCommand {  get; }
         public ICommand ChangeSelectedCategoryCommand { get; }
 
-        public Func<Note, List<Category>, bool, Task> OpenItemWindowAsyncFunc { get; set; }
-        public Func<Category, bool, Task> OpenCategoryWindowAsyncFunc { get; set; }
-
         public NotesListViewModel()
         {
+            _notesModel = new NotesListModel();
             _notesModel.PropertyChanged += OnNotesModelPropertyChanged;
+
+            _windowService = new WindowService();
 
             LoadData(null);
             LoadCommand = new ViewModelCommand(LoadData);
@@ -164,7 +166,7 @@ namespace WpfNotes.ViewModels
         {
             List<Category> categories = new List<Category>(_categories);
             categories.RemoveAt(0); // remove "All" category
-            await OpenItemWindowAsyncFunc?.Invoke(note, categories, isNewNote);
+            _windowService.ShowNoteWindow(new NoteViewModel(note, categories, isNewNote));
             if (isNewNote && !string.IsNullOrEmpty(note.Title))
             {
                 _notesModel.AddNote(note);
@@ -178,7 +180,7 @@ namespace WpfNotes.ViewModels
 
         private async Task OpenCategoryWindowAsync(Category category, bool isNewCategory)
         {
-            await OpenCategoryWindowAsyncFunc?.Invoke(category, isNewCategory);
+            _windowService.ShowCategoryWindow(new NoteCategoryViewModel(category, isNewCategory));
             if (isNewCategory && !string.IsNullOrEmpty(category.Name))
             {
                 Categories.Add(category);

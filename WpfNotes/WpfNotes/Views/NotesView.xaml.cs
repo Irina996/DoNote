@@ -26,31 +26,6 @@ namespace WpfNotes.Views
         public NotesView()
         {
             InitializeComponent();
-
-            Loaded += NotesView_Loaded;
-        }
-
-        private void NotesView_Loaded(object sender, RoutedEventArgs e)
-        {
-            if (DataContext is IWindowService<Note, Category> windowService)
-            {
-                windowService.OpenItemWindowAsyncFunc += OpenNoteWindowAsync;
-                windowService.OpenCategoryWindowAsyncFunc += OpenCategoryWindowAsync;
-            }
-        }
-
-        private async Task OpenNoteWindowAsync(Note note, List<Category> categories, bool isNewNote)
-        {
-            NoteWindow noteWindow = new NoteWindow(note, categories, isNewNote);
-            noteWindow.ShowDialog();
-        }
-
-        private async Task OpenCategoryWindowAsync(Category category, bool isNewCategory)
-        {
-            var categoryWindow = new CategoryWindow(
-                new NoteCategoryViewModel(category, isNewCategory)
-            );
-            categoryWindow.ShowDialog();
         }
 
         private void SearchTextBox_GotFocus(object sender, RoutedEventArgs e)
