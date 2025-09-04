@@ -63,7 +63,7 @@ namespace WpfNotes.Models.TaskItem
             if (category != null)
             {
                 tasksFilteredByCategory = AllTasks
-                    .Where(t => t.Category == category);
+                    .Where(t => t.Category.Id == category.Id);
             }
             Tasks = tasksFilteredByText
                 .Intersect(tasksFilteredByCategory)

@@ -161,8 +161,7 @@ namespace WpfNotes.ViewModels
         {
             List<TaskCategory> categories = new List<TaskCategory>(_categories);
             categories.RemoveAt(0); // remove "All" category
-            // TODO: open task window
-            //_windowService.ShowTaskWindow(new TaskViewMode(task, categories, isNewTask));
+            _windowService.ShowTaskWindow(new TaskViewModel(task, categories, isNewTask));
             if (isNewTask && !string.IsNullOrEmpty(task.Content))
             {
                 _tasksModel.AddTask(task);
@@ -189,7 +188,7 @@ namespace WpfNotes.ViewModels
 
         private void CreateTask(object obj)
         {
-            OpenTaskWindow(new TaskItem(), true);
+            OpenTaskWindow(new TaskItem() { Category = SelectedCategory }, true);
         }
 
         private void EditTask(object obj)

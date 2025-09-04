@@ -22,5 +22,11 @@ namespace WpfNotes.Services
             NoteWindow noteWindow = new NoteWindow(noteViewModel);
             noteWindow.ShowDialog();
         }
+
+        public void ShowTaskWindow(TaskViewModel taskViewModel)
+        {
+            TaskWindow taskWindow = new TaskWindow(taskViewModel);
+            taskWindow.ShowDialog();
+        }
     }
 }

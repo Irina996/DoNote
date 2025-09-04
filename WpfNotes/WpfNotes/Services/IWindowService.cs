@@ -13,6 +13,6 @@ namespace WpfNotes.Services
 
         void ShowNoteWindow(NoteViewModel noteViewModel);
 
-        // void ShowTaskWindow(TaskViewModel taskViewModel);
+        void ShowTaskWindow(TaskViewModel taskViewModel);
     }
 }
