@@ -1,19 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
+﻿using System.ComponentModel;
 using WpfNotes.Models.Note;
-using WpfNotes.Services;
 
 namespace WpfNotes.ViewModels
 {
-    class NoteCategoryViewModel : CategoryViewModel, IChangeWindows
+    public class NoteCategoryViewModel : CategoryViewModel
     {
         private readonly NoteCategoryModel _model;
-        private readonly IConfirmService _confirmService;
 
         private Category _category;
 
@@ -23,25 +15,12 @@ namespace WpfNotes.ViewModels
             set { _category = value; OnPropertyChanged(nameof(Category)); } 
         }
 
-        private bool isNewCategory = true;
-        public ICommand DeleteCommand { get; }
-        public ICommand CancelCommand { get; }
-        public ICommand SaveCommand { get; }
-        public Action Change { get; set; }
-
-        public NoteCategoryViewModel(Category category, bool isEmptyCategory) 
+        public NoteCategoryViewModel(Category category, bool isEmptyCategory) : base(isEmptyCategory)  
         {
-            isNewCategory = isEmptyCategory;
 
             _model = new NoteCategoryModel(category);
             _model.PropertyChanged += OnModelPropertyChanged;
             Category = _model.Category;
-
-            _confirmService = new ConfirmService();
-
-            DeleteCommand = new ViewModelCommand(DeleteCategory);
-            CancelCommand = new ViewModelCommand(CancelChanges);
-            SaveCommand = new ViewModelCommand(SaveCategory);
         }
 
         private void OnModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -52,7 +31,7 @@ namespace WpfNotes.ViewModels
             }
         }
 
-        private async void DeleteCategory(object obj)
+        protected override async void DeleteCategory(object obj)
         {
             if (_confirmService.ShowConfirmation("Confirm", "Delete category"))
             {
@@ -61,29 +40,24 @@ namespace WpfNotes.ViewModels
             }
         }
 
-        private void CancelChanges(object obj)
+        protected override void CancelChanges(object obj)
         {
             _model.CancelChanges();
             CloseWindow();
         }
 
-        private async void SaveCategory(object obj)
+        protected override async void SaveCategory(object obj)
         {
-            if (isNewCategory)
+            if (IsNewCategory)
             {
                 await _model.CreateCategory();
-                isNewCategory = false;
+                IsNewCategory = false;
             }
             else
             {
                 await _model.UpdateCategory();
             }
             CloseWindow();
-        }
-
-        private void CloseWindow()
-        {
-            Change?.Invoke();
         }
     }
 }
