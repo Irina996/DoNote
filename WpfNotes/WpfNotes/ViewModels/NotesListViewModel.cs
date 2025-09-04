@@ -193,7 +193,7 @@ namespace WpfNotes.ViewModels
 
         private void CreateNote(object obj)
         {
-            OpenNoteWindow(new Note(), true);
+            OpenNoteWindow(new Note() { Category = SelectedCategory}, true);
         }
 
         private void EditNote(object obj)
