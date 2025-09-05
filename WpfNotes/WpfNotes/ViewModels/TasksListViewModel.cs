@@ -12,6 +12,7 @@ namespace WpfNotes.ViewModels
 {
     public class TasksListViewModel : ViewModelBase
     {
+        private readonly ReminderService _reminderService;
         private readonly IWindowService _windowService;
         private readonly TasksListModel _tasksModel;
 
@@ -38,7 +39,10 @@ namespace WpfNotes.ViewModels
             set 
             { 
                 _tasks = value; 
-                OnPropertyChanged(nameof(Tasks)); 
+                OnPropertyChanged(nameof(Tasks));
+                _reminderService.Stop();
+                _reminderService.SetTasks(Tasks);
+                _reminderService.Start();
             } 
         }
         public ObservableCollection<TaskCategory> Categories
@@ -97,6 +101,7 @@ namespace WpfNotes.ViewModels
 
         public TasksListViewModel()
         {
+            _reminderService = new ReminderService();
             _windowService = new WindowService();
             _tasksModel = new TasksListModel();
             _tasksModel.PropertyChanged += OnTasksModelPropertyChanged;
@@ -114,6 +119,9 @@ namespace WpfNotes.ViewModels
             _tasks = new ObservableCollection<TaskItem>();
             _categories = new ObservableCollection<TaskCategory>();
             _searchText = "";
+
+            _reminderService.SetTasks(Tasks);
+            _reminderService.Start();
         }
 
         private void OnTasksModelPropertyChanged(object sender, PropertyChangedEventArgs e)
