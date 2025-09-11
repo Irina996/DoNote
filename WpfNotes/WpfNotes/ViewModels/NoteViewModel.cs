@@ -33,6 +33,7 @@ namespace WpfNotes.ViewModels
         public ICommand DeleteCommand { get; }
         public ICommand CancelCommand { get; }
         public ICommand BackCommand { get; }
+        public ICommand TogglePinCommand { get; }
 
         public Action Change { get; set; }
 
@@ -49,6 +50,7 @@ namespace WpfNotes.ViewModels
             DeleteCommand = new ViewModelCommand(DeleteNote);
             CancelCommand = new ViewModelCommand(Cancel);
             BackCommand = new ViewModelCommand(Back);
+            TogglePinCommand = new ViewModelCommand(TogglePinNote);
             this.isNewNote = isNewNote;
         }
 
@@ -57,7 +59,6 @@ namespace WpfNotes.ViewModels
             if (e.PropertyName == nameof(Note))
             {
                 Note = _noteModel.Note;
-                OnPropertyChanged(nameof(Note));
             }
         }
 
@@ -86,6 +87,18 @@ namespace WpfNotes.ViewModels
                     await _noteModel.DeleteNote();
                 }
                 CloseWindow();
+            }
+        }
+
+        private async void TogglePinNote(object obj)
+        {
+            if (!isNewNote)
+            {
+                await _noteModel.TogglePin();
+            }
+            else
+            {
+                Note.IsPinned = !Note.IsPinned;
             }
         }
 

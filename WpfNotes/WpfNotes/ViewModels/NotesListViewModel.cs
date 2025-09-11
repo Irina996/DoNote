@@ -92,6 +92,7 @@ namespace WpfNotes.ViewModels
         public ICommand LoadCommand { get; }
         public ICommand CreateNoteCommand { get; }
         public ICommand EditNoteCommand { get;  }
+        public ICommand TogglePinNoteCommand { get; }
         public ICommand CreateCategoryCommand { get; }
         public ICommand EditCategoryCommand { get; }
         public ICommand SearchNoteCommand {  get; }
@@ -108,6 +109,7 @@ namespace WpfNotes.ViewModels
             LoadCommand = new ViewModelCommand(LoadData);
             CreateNoteCommand = new ViewModelCommand(CreateNote);
             EditNoteCommand = new ViewModelCommand(EditNote);
+            TogglePinNoteCommand = new ViewModelCommand(TogglePinNote);
             CreateCategoryCommand = new ViewModelCommand(CreateCategory);
             EditCategoryCommand = new ViewModelCommand(EditCategory);
             SearchNoteCommand = new ViewModelCommand(FilterNotes);
@@ -137,8 +139,6 @@ namespace WpfNotes.ViewModels
                     Notes.Add(note);
                 }
                 SelectedNote = Notes.FirstOrDefault();
-                OnPropertyChanged(nameof(Notes));
-                OnPropertyChanged(nameof(SelectedNote));
             }
             else if (e.PropertyName == nameof(NotesListModel.Categories))
             {
@@ -150,8 +150,6 @@ namespace WpfNotes.ViewModels
                 {
                     _categories.Add(category);
                 }
-                OnPropertyChanged(nameof(Categories));
-                OnPropertyChanged(nameof(SelectedCategory));
             }
         }
 
@@ -214,6 +212,18 @@ namespace WpfNotes.ViewModels
         {
             Category category = new Category();
             OpenCategoryWindowAsync(category, true);
+        }
+
+        public void TogglePinNote(object obj)
+        {
+            if (obj is Note note)
+            {
+                List<Category> categories = new List<Category>(_categories);
+                categories.RemoveAt(0); // remove "All" category
+                NoteModel noteModel = new NoteModel(note, categories);
+                noteModel.TogglePin();
+                FilterNotes(null);
+            }
         }
 
         private void EditCategory(object obj)

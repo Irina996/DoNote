@@ -51,7 +51,9 @@ namespace WpfNotes.Models.Note
             try
             {
                 _allNotes = (await _apiService.GetNotesAsync())
-                    .OrderByDescending(n => n.ChangeDate).ToList();
+                    .OrderByDescending(n => n.IsPinned)
+                    .ThenByDescending(n => n.ChangeDate)
+                    .ToList();
                 Notes = _allNotes;
 
                 var categories = await _apiService.GetNoteCategoriesAsync();
@@ -89,7 +91,8 @@ namespace WpfNotes.Models.Note
                     .Where(n => n.Category.Id == category.Id);
             }
             Notes = filteredByText.Intersect(filteredByCategory)
-                .OrderByDescending(n => n.ChangeDate)
+                .OrderByDescending(n => n.IsPinned)
+                .ThenByDescending(n => n.ChangeDate)
                 .ToList();
         }
 
