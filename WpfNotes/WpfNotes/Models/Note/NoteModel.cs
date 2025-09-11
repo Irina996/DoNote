@@ -93,6 +93,13 @@ namespace WpfNotes.Models.Note
             Note = null;
         }
 
+        public async Task TogglePin()
+        {
+            _prevNote.IsPinned = !_prevNote.IsPinned;
+            await _apiService.UpdateNoteAsync(_prevNote);
+            _note.IsPinned = _prevNote.IsPinned;
+        }
+
         public void CancelChanges()
         {
             CopyNoteVersion();
