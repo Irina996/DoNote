@@ -96,7 +96,6 @@
                     Grid.Column="1"
                     Margin="50,5,50,5"
                     Background="#FFEC99"
-                    Click="Login_Click"
                     Command="{Binding LoginCommand}"
                     Content="Log in"
                     FontSize="20"

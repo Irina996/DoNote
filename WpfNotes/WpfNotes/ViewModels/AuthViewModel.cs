@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
+﻿using System.Windows.Input;
+using WpfNotes.Commands;
 using WpfNotes.Models;
 
 namespace WpfNotes.ViewModels
@@ -78,32 +73,26 @@ namespace WpfNotes.ViewModels
         public AuthViewModel()
         {
             _authModel = new AuthModel();
-            LoginCommand = new ViewModelCommand(ExecuteLoginCommand);
-            RegisterCommand = new ViewModelCommand(ExecuteRegisterCommand);
+            LoginCommand = new AsyncRelayCommand(ExecuteLoginCommand, () => CanExecuteLoginCommand());
+            RegisterCommand = new AsyncRelayCommand(ExecuteRegisterCommand, CanExecuteRegisterCommand);
         }
 
 
-        private bool CanExecuteLoginCommand(object obj)
+        private bool CanExecuteLoginCommand()
         {
             if (string.IsNullOrWhiteSpace(Email) || Email.Length < 3) 
             {
-                ErrorMessage = "Email is required";
                 return false;
             }
             if (Password == null || Password.Length < 3)
             {
-                ErrorMessage = "Password is required";
                 return false;
             }
             return true;
         }
 
-        private async void ExecuteLoginCommand(object obj)
+        private async Task ExecuteLoginCommand()
         {
-            if (!CanExecuteLoginCommand(obj))
-            {
-                return;
-            }
             ErrorMessage = "Logging in...";
             var result = await _authModel.LoginAsync(Email, Password, IsRememberMe);
             if (result)
@@ -116,37 +105,29 @@ namespace WpfNotes.ViewModels
             }
         }
 
-        private bool CanExecuteRegisterCommand(object obj)
+        private bool CanExecuteRegisterCommand()
         {
             if (string.IsNullOrWhiteSpace(Email))
             {
-                ErrorMessage = "Email is required";
                 return false;
             }
             if (Password == null || Password.Length < 3)
             {
-                ErrorMessage = "Password is required";
                 return false;
             }
             if (ConfirmPassword == null || ConfirmPassword.Length < 3)
             {
-                ErrorMessage = "Confirm Password is required";
                 return false;
             }
             if (Password != ConfirmPassword)
             {
-                ErrorMessage = "Passwords must be same";
                 return false;
             }
             return true;
         }
 
-        private async void ExecuteRegisterCommand(object obj)
+        private async Task ExecuteRegisterCommand()
         {
-            if (!CanExecuteRegisterCommand(obj))
-            {
-                return;
-            }
             ErrorMessage = "Registering...";
             var result = await _authModel.RegisterAsync(Email, Password, ConfirmPassword, IsRememberMe);
             if (result)

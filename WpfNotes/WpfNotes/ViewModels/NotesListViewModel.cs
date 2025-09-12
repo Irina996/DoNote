@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
+using WpfNotes.Commands;
 using WpfNotes.Models.Note;
 using WpfNotes.Services;
 
@@ -105,15 +100,15 @@ namespace WpfNotes.ViewModels
 
             _windowService = new WindowService();
 
-            LoadData(null);
-            LoadCommand = new ViewModelCommand(LoadData);
-            CreateNoteCommand = new ViewModelCommand(CreateNote);
-            EditNoteCommand = new ViewModelCommand(EditNote);
-            TogglePinNoteCommand = new ViewModelCommand(TogglePinNote);
-            CreateCategoryCommand = new ViewModelCommand(CreateCategory);
-            EditCategoryCommand = new ViewModelCommand(EditCategory);
-            SearchNoteCommand = new ViewModelCommand(FilterNotes);
-            ChangeSelectedCategoryCommand = new ViewModelCommand(FilterNotes);
+            LoadData();
+            LoadCommand = new AsyncRelayCommand(LoadData);
+            CreateNoteCommand = new RelayCommand(CreateNote);
+            EditNoteCommand = new RelayCommand(EditNote);
+            TogglePinNoteCommand = new RelayCommand(TogglePinNote);
+            CreateCategoryCommand = new RelayCommand(CreateCategory);
+            EditCategoryCommand = new RelayCommand(EditCategory);
+            SearchNoteCommand = new RelayCommand(FilterNotes);
+            ChangeSelectedCategoryCommand = new RelayCommand(FilterNotes);
 
             _allNotes = new ObservableCollection<Note>();
             _notes = new ObservableCollection<Note>();
@@ -153,7 +148,7 @@ namespace WpfNotes.ViewModels
             }
         }
 
-        private async void LoadData(object obj)
+        private async Task LoadData()
         {
             IsLoading = true;
             await _notesModel.LoadAsync();
@@ -173,7 +168,7 @@ namespace WpfNotes.ViewModels
             {
                 _notesModel.RemoveNote(note);
             }
-            FilterNotes(null);
+            FilterNotes();
         }
 
         private async Task OpenCategoryWindowAsync(Category category, bool isNewCategory)
@@ -189,7 +184,7 @@ namespace WpfNotes.ViewModels
             }
         }
 
-        private void CreateNote(object obj)
+        private void CreateNote()
         {
             var note = new Note();
             if (SelectedCategory.Id == -1)
@@ -203,12 +198,12 @@ namespace WpfNotes.ViewModels
             OpenNoteWindow(note, true);
         }
 
-        private void EditNote(object obj)
+        private void EditNote()
         {
             OpenNoteWindow(SelectedNote, false);
         }
 
-        private void CreateCategory(object obj)
+        private void CreateCategory()
         {
             Category category = new Category();
             OpenCategoryWindowAsync(category, true);
@@ -222,11 +217,12 @@ namespace WpfNotes.ViewModels
                 categories.RemoveAt(0); // remove "All" category
                 NoteModel noteModel = new NoteModel(note, categories);
                 noteModel.TogglePin();
-                FilterNotes(null);
+                note.ChangeDate = DateTime.Now;
+                FilterNotes();
             }
         }
 
-        private void EditCategory(object obj)
+        private void EditCategory()
         {
             if (SelectedCategory.Id != -1)
             {
@@ -234,7 +230,7 @@ namespace WpfNotes.ViewModels
             }
         }
 
-        private void FilterNotes(object obj)
+        private void FilterNotes()
         {
             SelectedCategory ??= Categories[0];
             if (SelectedCategory.Id == -1)

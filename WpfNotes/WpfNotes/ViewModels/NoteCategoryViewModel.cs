@@ -31,7 +31,7 @@ namespace WpfNotes.ViewModels
             }
         }
 
-        protected override async void DeleteCategory(object obj)
+        protected override async Task DeleteCategory()
         {
             if (_confirmService.ShowConfirmation("Confirm", "Delete category"))
             {
@@ -40,13 +40,13 @@ namespace WpfNotes.ViewModels
             }
         }
 
-        protected override void CancelChanges(object obj)
+        protected override void CancelChanges()
         {
             _model.CancelChanges();
             CloseWindow();
         }
 
-        protected override async void SaveCategory(object obj)
+        protected override async Task SaveCategory()
         {
             if (IsNewCategory)
             {

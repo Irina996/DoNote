@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
+using WpfNotes.Commands;
 using WpfNotes.Models.Note;
 using WpfNotes.Services;
 
@@ -46,15 +42,15 @@ namespace WpfNotes.ViewModels
 
             _confirmService = new ConfirmService();
 
-            SaveCommand = new ViewModelCommand(SaveNote);
-            DeleteCommand = new ViewModelCommand(DeleteNote);
-            CancelCommand = new ViewModelCommand(Cancel);
-            BackCommand = new ViewModelCommand(Back);
-            TogglePinCommand = new ViewModelCommand(TogglePinNote);
+            SaveCommand = new AsyncRelayCommand(SaveNote);
+            DeleteCommand = new AsyncRelayCommand(DeleteNote);
+            CancelCommand = new RelayCommand(Cancel);
+            BackCommand = new RelayCommand(Back);
+            TogglePinCommand = new AsyncRelayCommand(TogglePinNote);
             this.isNewNote = isNewNote;
         }
 
-        private async void OnNotePropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void OnNotePropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(Note))
             {
@@ -62,7 +58,7 @@ namespace WpfNotes.ViewModels
             }
         }
 
-        private async void SaveNote(object obj)
+        private async Task SaveNote()
         {
             if (_confirmService.ShowConfirmation("Confirm", "Save the note?"))
             {
@@ -78,7 +74,7 @@ namespace WpfNotes.ViewModels
             }
         }
 
-        private async void DeleteNote(object obj)
+        private async Task DeleteNote()
         {
             if (_confirmService.ShowConfirmation("Confirm", "Delete the note?"))
             {
@@ -90,7 +86,7 @@ namespace WpfNotes.ViewModels
             }
         }
 
-        private async void TogglePinNote(object obj)
+        private async Task TogglePinNote()
         {
             if (!isNewNote)
             {
@@ -102,7 +98,7 @@ namespace WpfNotes.ViewModels
             }
         }
 
-        private void Cancel(object obj)
+        private void Cancel()
         {
             if (_confirmService.ShowConfirmation("Confirm", "Cancel?"))
             {
@@ -110,7 +106,7 @@ namespace WpfNotes.ViewModels
             }
         }
 
-        private void Back(object obj)
+        private void Back()
         {
             CloseWindow();
         }
