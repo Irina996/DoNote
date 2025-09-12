@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
+using WpfNotes.Commands;
 using WpfNotes.Models.TaskItem;
 using WpfNotes.Services;
 
@@ -58,11 +54,11 @@ namespace WpfNotes.ViewModels
 
             _confirmService = new ConfirmService();
 
-            SaveCommand = new ViewModelCommand(SaveTask);
-            DeleteCommand = new ViewModelCommand(DeleteTask);
-            CancelCommand = new ViewModelCommand(Cancel);
-            BackCommand = new ViewModelCommand(Back);
-            NotificationCommand = new ViewModelCommand(SetNotification);
+            SaveCommand = new AsyncRelayCommand(SaveTask);
+            DeleteCommand = new AsyncRelayCommand(DeleteTask);
+            CancelCommand = new RelayCommand(Cancel);
+            BackCommand = new RelayCommand(Back);
+            NotificationCommand = new RelayCommand(SetNotification);
         }
 
         private void OnModelPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -73,7 +69,7 @@ namespace WpfNotes.ViewModels
             }
         }
 
-        private async void SaveTask(object obj)
+        private async Task SaveTask()
         {
             if (_confirmService.ShowConfirmation("Confirm", "Save the task?"))
             {
@@ -89,7 +85,7 @@ namespace WpfNotes.ViewModels
             }
         }
 
-        private async void DeleteTask(object obj)
+        private async Task DeleteTask()
         {
             if (_confirmService.ShowConfirmation("Confirm", "Delete the task?"))
             {
@@ -101,7 +97,7 @@ namespace WpfNotes.ViewModels
             }
         }
 
-        private void Cancel(object obj)
+        private void Cancel()
         {
             if (_confirmService.ShowConfirmation("Confirm", "Cancel?"))
             {
@@ -109,12 +105,12 @@ namespace WpfNotes.ViewModels
             }
         }
 
-        private void SetNotification(object obj)
+        private void SetNotification()
         {
             throw new NotImplementedException();
         }
 
-        private void Back(object obj)
+        private void Back()
         {
             CloseWindow();
         }

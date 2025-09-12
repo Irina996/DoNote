@@ -50,7 +50,7 @@ namespace WpfNotes.Models.Note
             return true;
         }
 
-        public async void CancelChanges()
+        public void CancelChanges()
         {
             CopyVersion();
         }

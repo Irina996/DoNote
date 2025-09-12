@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
 using System.Windows.Input;
+using WpfNotes.Commands;
 using WpfNotes.Models.TaskItem;
 using WpfNotes.Services;
 
@@ -106,14 +103,14 @@ namespace WpfNotes.ViewModels
             _tasksModel = new TasksListModel();
             _tasksModel.PropertyChanged += OnTasksModelPropertyChanged;
 
-            LoadData(null);
-            LoadCommand = new ViewModelCommand(LoadData);
-            CreateTaskCommand = new ViewModelCommand(CreateTask);
-            EditTaskCommand = new ViewModelCommand(EditTask);
-            CreateCategoryCommand = new ViewModelCommand(CreateCategory);
-            EditCategoryCommand = new ViewModelCommand(EditCategory);
-            SearchTaskCommand = new ViewModelCommand(FilterTasks);
-            ChangeSelectedCategoryCommand = new ViewModelCommand(FilterTasks);
+            LoadData();
+            LoadCommand = new AsyncRelayCommand(LoadData);
+            CreateTaskCommand = new RelayCommand(CreateTask);
+            EditTaskCommand = new RelayCommand(EditTask);
+            CreateCategoryCommand = new RelayCommand(CreateCategory);
+            EditCategoryCommand = new RelayCommand(EditCategory);
+            SearchTaskCommand = new RelayCommand(FilterTasks);
+            ChangeSelectedCategoryCommand = new RelayCommand(FilterTasks);
 
             _allTasks = new ObservableCollection<TaskItem>();
             _tasks = new ObservableCollection<TaskItem>();
@@ -158,7 +155,7 @@ namespace WpfNotes.ViewModels
             }
         }
 
-        private async void LoadData(object obj)
+        private async Task LoadData()
         {
             IsLoading = true;
             await _tasksModel.LoadAsync();
@@ -178,7 +175,7 @@ namespace WpfNotes.ViewModels
             {
                 _tasksModel.RemoveTask(task);
             }
-            FilterTasks(null);
+            FilterTasks();
         }
 
         private async Task OpenCategoryWindowAsync(TaskCategory category, bool isNewCategory)
@@ -194,7 +191,7 @@ namespace WpfNotes.ViewModels
             }
         }
 
-        private void CreateTask(object obj)
+        private void CreateTask()
         {
             var task = new TaskItem();
             if (SelectedCategory.Id == -1)
@@ -208,22 +205,22 @@ namespace WpfNotes.ViewModels
             OpenTaskWindow(task, true);
         }
 
-        private void EditTask(object obj)
+        private void EditTask()
         {
             OpenTaskWindow(SelectedTask, false);
         }
 
-        private void CreateCategory(object obj)
+        private void CreateCategory()
         {
             OpenCategoryWindowAsync(new TaskCategory(), true);
         }
 
-        private void EditCategory(object obj)
+        private void EditCategory()
         {
             OpenCategoryWindowAsync(SelectedCategory, false);
         }
 
-        private void FilterTasks(object obj)
+        private void FilterTasks()
         {
             SelectedCategory ??= Categories[0];
             if (SelectedCategory.Id == -1)

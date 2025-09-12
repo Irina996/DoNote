@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using WpfNotes.ApiModels.Auth;
 using WpfNotes.Services;
-using WpfNotes.ApiModels.Auth;
 
 namespace WpfNotes.Models
 {
@@ -17,7 +12,6 @@ namespace WpfNotes.Models
             _authService = new AuthService();
         }
 
-        // TODO: rewrite to notify about result
         public async Task<bool> LoginAsync(string email, string password, bool isRememberMe)
         {
             var token = await _authService.LoginAsync(new LoginRequest { Email = email, Password = password });

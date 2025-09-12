@@ -1,4 +1,5 @@
 ﻿using System.Windows.Input;
+using WpfNotes.Commands;
 using WpfNotes.Services;
 
 namespace WpfNotes.ViewModels
@@ -19,14 +20,14 @@ namespace WpfNotes.ViewModels
             _confirmService = new ConfirmService();
             IsNewCategory = isNew;
 
-            DeleteCommand = new ViewModelCommand(DeleteCategory);
-            CancelCommand = new ViewModelCommand(CancelChanges);
-            SaveCommand = new ViewModelCommand(SaveCategory);
+            DeleteCommand = new AsyncRelayCommand(DeleteCategory);
+            CancelCommand = new RelayCommand(CancelChanges);
+            SaveCommand = new AsyncRelayCommand(SaveCategory);
         }
 
-        protected abstract void DeleteCategory(object obj);
-        protected abstract void CancelChanges(object obj);
-        protected abstract void SaveCategory(object obj);
+        protected abstract Task DeleteCategory();
+        protected abstract void CancelChanges();
+        protected abstract Task SaveCategory();
 
         protected void CloseWindow()
         {
