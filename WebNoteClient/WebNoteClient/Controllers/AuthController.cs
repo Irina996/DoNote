@@ -79,8 +79,8 @@ namespace WebNoteClient.Controllers
         {
             var claims = new[]
             {
-                    new Claim(ClaimTypes.Email, authResult.Email),
-                    new Claim("AcessToken", string.Format("Bearer {0}", authResult.Token)),
+                new Claim(ClaimTypes.Email, authResult.Email),
+                new Claim("AccessToken", authResult.Token),
             };
 
             var claimsIdentity = new ClaimsIdentity(claims,
