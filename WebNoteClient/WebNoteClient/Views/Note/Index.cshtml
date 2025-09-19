@@ -30,15 +30,15 @@
 			{
 				var checkboxId = $"clipToggle_{note.Id}";
 				<div class="item-card">
-					<div>
+					<form asp-action="TogglePin" asp-route-id="@note.Id" class="d-inline">
 						<input type="checkbox"
 							class="form-check-input visually-hidden"
 							id="@checkboxId"
 							@(note.IsPinned ? "checked" : "")>
-						<a class="form-check-label clip-label" for="@checkboxId" asp-action="TogglePin" asp-route-id="@note.Id">
+						<button type="submit" class="form-check-label clip-label" for="@checkboxId">
 							<i class="bi bi-paperclip"></i>
-						</a>
-					</div>
+						</button>
+					</form>
 					<div>
 						<h3>@note.Title</h3>
 						<pre>@note.Content</pre>
