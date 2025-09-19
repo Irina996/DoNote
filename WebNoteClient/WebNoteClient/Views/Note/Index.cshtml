@@ -1,0 +1,63 @@
+﻿@model WebNoteClient.Models.Note.NotePageViewModel
+
+@{
+	ViewData["Title"] = "Notes";
+}
+
+<h1>Notes</h1>
+
+<hr/>
+
+<div class="container">
+	<div class="row">
+		<div class="col-md-3">
+			<h2>Categories</h2>
+			<a href="@Url.Action("Index", "Note")"
+			   class="btn my-1 @(Model.SelectedCategoryId == null ? "btn-secondary" : "btn-outline-secondary")">
+				All
+			</a>
+			@foreach (var category in Model.Categories)
+			{
+				<a href="@Url.Action("Index", "Note", new {categoryId = category.Id})"
+					class="btn my-1 @(Model.SelectedCategoryId == category.Id ? "btn-secondary" : "btn-outline-secondary")">
+					@category.Name
+				</a>
+			}
+		</div>
+		<div class="col-md-9 grey-yellow-bg">
+			<h2>Notes</h2>
+			@foreach (var note in Model.Notes)
+			{
+				var checkboxId = $"clipToggle_{note.Id}";
+				<div class="item-card">
+					<form asp-action="TogglePin" asp-route-id="@note.Id" class="d-inline">
+						<input type="checkbox"
+							class="form-check-input visually-hidden"
+							id="@checkboxId"
+							@(note.IsPinned ? "checked" : "")>
+						<button type="submit" class="form-check-label clip-label" for="@checkboxId">
+							<i class="bi bi-paperclip"></i>
+						</button>
+					</form>
+					<div>
+						<h3>@note.Title</h3>
+						<pre>@note.Content</pre>
+						<p class="text-secondary">@note.ChangeDate.ToString("dd/MM/yyyy")</p>
+					</div>
+					<div class="item-card-btn-group">
+						<a class="btn btn-secondary" asp-action="Edit" asp-route-id="@note.Id"><i class="bi bi-pencil"></i></a>
+						<form asp-action="Delete" asp-route-id="@note.Id" method="post" class="d-inline">
+							@Html.AntiForgeryToken()
+							<button type="submit"
+									class="btn btn-danger"
+									onclick="return confirm('Are you sure you want to delete this note?');">
+								<i class="bi bi-trash"></i>
+							</button>
+						</form>
+					</div>
+				</div>
+			}
+			<a asp-action="Create" class="btn btn-float-add">Add</a>
+		</div>
+	</div>
+</div>
