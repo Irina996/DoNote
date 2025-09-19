@@ -209,6 +209,7 @@ namespace WebNotes.Controllers {
         /// <response code="204">Indicates the note was successfully updated.</response>
         /// <response code="401">If the user is not authenticated.</response>
         /// <response code="404">If the note does not exist or does not belong to the user.</response>
+        [HttpPatch("{id}/pin")]
         public async Task<IActionResult> ToggleNotePin(int id)
         {
             var user = await _userManager.GetUserAsync(User);
