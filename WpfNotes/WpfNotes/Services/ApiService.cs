@@ -264,6 +264,23 @@ namespace WpfNotes.Services
             }
         }
 
+        public async Task TogglePinNote(Note note)
+        {
+            if (note == null)
+            {
+                throw new ArgumentNullException(nameof(note));
+            }
+
+            var request = new HttpRequestMessage(HttpMethod.Patch, notesRoute + note.Id + "/pin");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+
+            var response = await _httpClient.SendAsync(request);
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new HttpRequestException($"HTTP request failed with status code: {response.StatusCode}");
+            }
+        }
+
         public async Task<Category> CreateNoteCategoryAsync(Category category)
         {
             if (category == null)

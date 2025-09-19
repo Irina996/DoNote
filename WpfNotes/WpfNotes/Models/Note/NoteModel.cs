@@ -96,7 +96,7 @@ namespace WpfNotes.Models.Note
         public async Task TogglePin()
         {
             _prevNote.IsPinned = !_prevNote.IsPinned;
-            await _apiService.UpdateNoteAsync(_prevNote);
+            await _apiService.TogglePinNote(_prevNote);
             _note.IsPinned = _prevNote.IsPinned;
         }
 
