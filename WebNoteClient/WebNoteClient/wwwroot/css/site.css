@@ -18,7 +18,7 @@ html {
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 html {
@@ -28,7 +28,7 @@ html {
 
 body {
     margin-bottom: 60px;
-    font-family: 'Excalifont', Arial, sans-serif !important;
+    font-family: 'Excalifont', Arial, sans-serif;
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
@@ -39,3 +39,236 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+pre {
+    font-family: 'Excalifont', Arial, sans-serif;
+}
+
+.grey-yellow-bg {
+    background-color: #f5f3e5;
+}
+
+.yellow-bg {
+    background-color: #fdd835;
+}
+
+    .yellow-bg:hover {
+        background-color: #fbc02d;
+    }
+
+.btn-float-add {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 1000; /* Ensures it floats above everything */
+    background-color: #fdd835;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-size: 1.5rem;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+    .btn-float-add:hover {
+        background-color: #fbc02d;
+        transform: scale(1.05);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+
+/* Smaller on mobile */
+@media (max-width: 576px) {
+    .btn-float-add {
+        bottom: 16px;
+        right: 16px;
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+}
+
+.item-card {
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    padding: 1rem;
+    margin: 1rem;
+    border-radius: 8px;
+}
+
+    .item-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        background-color: #f8f9fa;
+    }
+
+    .item-card h3 {
+        font-size: 1.5rem;
+    }
+
+    .item-card div.pre {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        border: none;
+    }
+
+.item-card-btn-group {
+    margin-top: 1rem;
+}
+
+.clip-label {
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+}
+
+
+.clip-label i {
+    font-size: 1.5rem;
+    color: gray; /* default = not pinned */
+    transition: color 0.2s ease;
+    cursor: pointer;
+}
+
+/* When checkbox is checked */
+.form-check-input:checked + .clip-label i {
+    color: black;
+}
+
+.title {
+    font-size: 1.6rem;
+}
+
+textarea {
+    font-size: 1rem;
+    padding: 8px;
+    resize: vertical; 
+    height: 70%;
+    width: 70%;
+    background-color: white;
+}
+
+
+/* ===== Primary Button ===== */
+.btn-primary {
+    --bs-btn-bg: #ffec99;
+    --bs-btn-border-color: #ffec99;
+    --bs-btn-color: #000;
+    --bs-btn-hover-bg: #ffe066;
+    --bs-btn-hover-border-color: #ffe066;
+    --bs-btn-active-bg: #ffd43b;
+    --bs-btn-active-border-color: #ffd43b;
+    --bs-btn-focus-shadow-rgb: 255, 236, 153;
+    --bs-btn-disabled-bg: #fff3cd;
+    --bs-btn-disabled-border-color: #fff3cd;
+    --bs-btn-disabled-color: #6c757d;
+}
+
+/* ===== Secondary Button ===== */
+.btn-secondary {
+    --bs-btn-bg: #fff9db;
+    --bs-btn-border-color: #fff9db;
+    --bs-btn-color: #5c5c5c;
+    --bs-btn-hover-bg: #ffec99;
+    --bs-btn-hover-border-color: #ffec99;
+    --bs-btn-hover-color: #000;
+    --bs-btn-active-bg: #ffe066;
+    --bs-btn-active-border-color: #ffe066;
+    --bs-btn-active-color: #000;
+    --bs-btn-focus-shadow-rgb: 255, 249, 219;
+    --bs-btn-disabled-bg: #fcfbe9;
+    --bs-btn-disabled-border-color: #fcfbe9;
+    --bs-btn-disabled-color: #aaa;
+}
+
+/* ===== Danger Button ===== */
+.btn-danger {
+    --bs-btn-bg: #ff8787;
+    --bs-btn-border-color: #ff8787;
+    --bs-btn-color: #000;
+    --bs-btn-hover-bg: #ff6b6b;
+    --bs-btn-hover-border-color: #ff6b6b;
+    --bs-btn-active-bg: #ff5252;
+    --bs-btn-active-border-color: #ff5252;
+    --bs-btn-focus-shadow-rgb: 255, 135, 135;
+    --bs-btn-disabled-bg: #ffe0e0;
+    --bs-btn-disabled-border-color: #ffe0e0;
+    --bs-btn-disabled-color: #8a4f4f;
+}
+
+.btn:focus,
+.btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px black;
+}
+
+/* ===== Base Input Style ===== */
+.form-control {
+    background-color: #fff9db;
+    border: 2px solid #e0e0e0;
+    color: #333;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .form-control:focus {
+        border-color: #ffec99;
+        box-shadow: 0 0 0 0.2rem rgba(255, 236, 153, 0.4);
+    }
+
+    .form-control.is-invalid,
+    .form-control:invalid {
+        border-color: #ff8787;
+        padding-right: calc(1.5em + 0.75rem);
+    }
+
+        .form-control.is-invalid:focus,
+        .form-control:invalid:focus {
+            border-color: #ff8787;
+            box-shadow: 0 0 0 0.2rem rgba(255, 135, 135, 0.4);
+        }
+
+    .form-control.is-valid {
+        border-color: #8ac926;
+    }
+
+        .form-control.is-valid:focus {
+            border-color: #8ac926;
+            box-shadow: 0 0 0 0.2rem rgba(138, 201, 38, 0.4);
+        }
+
+.invalid-feedback {
+    color: #ff8787;
+}
+
+.valid-feedback {
+    color: #8ac926;
+}
+
+/* ===== OVERRIDE BROWSER AUTOFILL ===== */
+.form-control:-webkit-autofill,
+.form-control:-webkit-autofill:hover,
+.form-control:-webkit-autofill:focus,
+.form-control:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px #fff9db inset;
+    -webkit-text-fill-color: #333;
+    caret-color: #333;
+}
+
+/* ===== Base Link ===== */
+a {
+    color: #5c4a00;
+    text-decoration: none;
+    transition: color 0.2s ease, text-decoration 0.2s ease;
+}
+
+    a:hover {
+        color: #3d3200;
+        text-decoration: underline;
+    }
+
+    a:focus {
+        color: #5c4a00;
+        outline: 2px solid #ffec99;
+        outline-offset: 2px;
+        border-radius: 3px;
+    }
