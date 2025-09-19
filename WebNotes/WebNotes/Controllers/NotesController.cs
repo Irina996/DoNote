@@ -200,5 +200,31 @@ namespace WebNotes.Controllers {
                 }
             };
         }
+
+        /// <summary>
+        /// Update notes pin state
+        /// </summary>
+        /// <param name="id">Note id that needed to change pin state</param>
+        /// <returns>No content if the update is successful.</returns>
+        /// <response code="204">Indicates the note was successfully updated.</response>
+        /// <response code="401">If the user is not authenticated.</response>
+        /// <response code="404">If the note does not exist or does not belong to the user.</response>
+        public async Task<IActionResult> ToggleNotePin(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            var note = await _context.Notes.Include(n => n.Category)
+                .FirstOrDefaultAsync(n => n.Id == id && user.Id == n.Category.UserId);
+            if (note == null)
+            {
+                return NotFound(new { message = "Note not found or access denied." });
+            }
+
+            note.IsPinned = !note.IsPinned;
+            _context.Notes.Update(note);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
     }
 }
