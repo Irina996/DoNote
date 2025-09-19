@@ -99,7 +99,7 @@ namespace WebNoteClient.Controllers
         // POST: NoteController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(int id, NoteModel note)
+        public async Task<ActionResult> Edit(NoteModel note)
         {
             try
             {
@@ -130,7 +130,7 @@ namespace WebNoteClient.Controllers
                     return RedirectToAction("Login", "Auth");
                 }
                 await _apiService.DeleteNoteAsync(accessTokenClaim.Value, id);
-                return RedirectToAction(nameof(Index), new { message = "Note deleted successfully." });
+                return RedirectToAction(nameof(Index), new { message = "Note was deleted successfully." });
             }
             catch
             {
