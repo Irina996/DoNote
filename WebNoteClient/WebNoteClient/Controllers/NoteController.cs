@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 using WebNoteClient.Models.Note;
 using WebNoteClient.Services;
 
@@ -137,9 +138,22 @@ namespace WebNoteClient.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult TogglePin(int id)
+        public async Task<IActionResult> TogglePin(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var accessTokenClaim = HttpContext.User.FindFirst("AccessToken");
+                if (accessTokenClaim == null)
+                {
+                    return RedirectToAction("Login", "Auth");
+                }
+                await _apiService.ToggleNotePinAsync(accessTokenClaim.Value, id);
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return View();
+            }
         }
     }
 }

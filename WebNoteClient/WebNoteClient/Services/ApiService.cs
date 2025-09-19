@@ -173,5 +173,17 @@ namespace WebNoteClient.Services
                 throw new HttpRequestException($"HTTP request failed with status code: {response.StatusCode}");
             }
         }
+
+        public async Task ToggleNotePinAsync(string token, int id)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Patch, notesRoute + id + "/pin/");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var response = await _httpClient.SendAsync(request);
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new HttpRequestException($"HTTP request failed with status code: {response.StatusCode}");
+            }
+        }
     }
 }
