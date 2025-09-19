@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 using System.Threading.Tasks;
+using WebNoteClient.Models;
 using WebNoteClient.Models.Note;
 using WebNoteClient.Services;
 
@@ -73,7 +75,7 @@ namespace WebNoteClient.Controllers
             }
             catch
             {
-                return View();
+                return RedirectToAction(nameof(Error));
             }
         }
 
@@ -111,7 +113,7 @@ namespace WebNoteClient.Controllers
             }
             catch
             {
-                return View();
+                return RedirectToAction(nameof(Error));
             }
         }
 
@@ -132,7 +134,7 @@ namespace WebNoteClient.Controllers
             }
             catch
             {
-                return View();
+                return RedirectToAction(nameof(Error));
             }
         }
 
@@ -152,8 +154,14 @@ namespace WebNoteClient.Controllers
             }
             catch
             {
-                return View();
+                return RedirectToAction(nameof(Error));
             }
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }
