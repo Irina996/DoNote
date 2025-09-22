@@ -22,7 +22,7 @@ namespace WpfNotes.Models
                     Settings.Default.JwtToken = token;
                     Settings.Default.Save();
                 }
-                ApiService.GetInstance(token);
+                ApiService.Initialize(token);
                 return true;
             }
             return false;
@@ -44,7 +44,7 @@ namespace WpfNotes.Models
                     Settings.Default.JwtToken = token;
                     Settings.Default.Save();
                 }
-                ApiService.GetInstance(token);
+                ApiService.Initialize(token);
                 return true;
             }
             return false;

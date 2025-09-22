@@ -13,6 +13,7 @@ namespace WpfNotes.Services
     public class ApiService
     {
         private static ApiService instance;
+        private static readonly object _lock = new object();
 
         private readonly HttpClient _httpClient;
 
@@ -41,15 +42,25 @@ namespace WpfNotes.Services
             _token = token;
         }
 
+        public static void Initialize(string token)
+        {
+            if (string.IsNullOrEmpty(token))
+                throw new ArgumentNullException(nameof(token));
+
+            lock (_lock)
+            {
+                if (instance != null)
+                    throw new InvalidOperationException("ApiService has already been initialized.");
+
+                instance = new ApiService(token);
+            }
+        }
         public static ApiService GetInstance()
         {
-            return instance;
-        }
-
-        public static ApiService GetInstance(string token)
-        {
             if (instance == null)
-                instance = new ApiService(token);
+            {
+                throw new InvalidOperationException("ApiService should be initialized first.");
+            }
             return instance;
         }
 
