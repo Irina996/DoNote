@@ -16,7 +16,7 @@ namespace WpfNotes
 
             if (!string.IsNullOrEmpty(jwtToken) && !IsJwtExpired(jwtToken))
             {
-                ApiService.GetInstance(jwtToken);
+                ApiService.Initialize(jwtToken);
                 new MainWindow().Show();
             }
             else
