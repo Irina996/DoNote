@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Reflection;
 using System.Threading.Tasks;
 using WebNoteClient.Models;
 using WebNoteClient.Models.Note;
@@ -19,28 +20,34 @@ namespace WebNoteClient.Controllers
         }
 
         // GET: NoteController
-        public async Task<IActionResult> Index(int? categoryId)
+        public async Task<IActionResult> Index(int? categoryId, string? searchText)
         {
             var accessTokenClaim = HttpContext.User.FindFirst("AccessToken");
             if (accessTokenClaim == null)
             {
                 return RedirectToAction("Login", "Auth");
             }
-            var notes = await _apiService.GetNotesAsync(accessTokenClaim.Value);
+            IEnumerable<NoteModel> notes = await _apiService.GetNotesAsync(accessTokenClaim.Value);
             var categories = await _apiService.GetNoteCategoriesAsync(accessTokenClaim.Value);
             if (categoryId != null)
             {
-                notes = notes.Where(n => n.Category.Id == categoryId).ToList();
+                notes = notes.Where(n => n.Category.Id == categoryId);
+            }
+            if (searchText != null)
+            {
+                notes = notes
+                    .Where(n => n.Title.Contains(searchText, StringComparison.OrdinalIgnoreCase) 
+                    || n.Content.Contains(searchText, StringComparison.OrdinalIgnoreCase));
             }
             notes = notes
                 .OrderByDescending(n => n.IsPinned)
-                .ThenByDescending(n => n.ChangeDate)
-                .ToList();
+                .ThenByDescending(n => n.ChangeDate);
             var model = new NotePageViewModel
             {
                 Categories = categories,
-                Notes = notes,
+                Notes = notes.ToList(),
                 SelectedCategoryId = categoryId,
+                SearchQuery = searchText,
             };
             return View(model);
         }
@@ -151,6 +158,67 @@ namespace WebNoteClient.Controllers
                 }
                 await _apiService.ToggleNotePinAsync(accessTokenClaim.Value, id);
                 return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return RedirectToAction(nameof(Error));
+            }
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> CreateCategory([FromBody] NoteCategoryModel model)
+        {
+            try
+            {
+                var accessTokenClaim = HttpContext.User.FindFirst("AccessToken");
+                if (accessTokenClaim == null)
+                {
+                    throw new AccessViolationException("Access denied");
+                }
+
+                await _apiService.CreateNoteCategoryAsync(accessTokenClaim.Value, model);
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> UpdateCategory([FromBody] NoteCategoryModel model)
+        {
+            try
+            {
+                var accessTokenClaim = HttpContext.User.FindFirst("AccessToken");
+                if (accessTokenClaim == null)
+                {
+                    throw new AccessViolationException("Access denied");
+                }
+
+                await _apiService.UpdateNoteCategoryAsync(accessTokenClaim.Value, model);
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteCategory(int id)
+        {
+            try
+            {
+                var accessTokenClaim = HttpContext.User.FindFirst("AccessToken");
+                if (accessTokenClaim == null)
+                {
+                    return RedirectToAction("Login", "Auth");
+                }
+                await _apiService.DeleteNoteCategoryAsync(accessTokenClaim.Value, id);
+                return RedirectToAction(nameof(Index), new { message = "Category was deleted successfully." });
             }
             catch
             {

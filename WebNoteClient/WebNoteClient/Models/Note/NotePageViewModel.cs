@@ -6,5 +6,7 @@
         public List<NoteModel> Notes { get; set; }
 
         public int? SelectedCategoryId { get; set; }
+
+        public string? SearchQuery { get; set; }
     }
 }
