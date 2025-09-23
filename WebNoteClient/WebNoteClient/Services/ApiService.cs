@@ -185,5 +185,66 @@ namespace WebNoteClient.Services
                 throw new HttpRequestException($"HTTP request failed with status code: {response.StatusCode}");
             }
         }
+
+        private CreateCategoryRequest ToCreateCategoryRequest(NoteCategoryModel category)
+        {
+            return new CreateCategoryRequest { Name = category.Name, };
+        }
+
+        public async Task<NoteCategoryModel> CreateNoteCategoryAsync(string token, NoteCategoryModel category)
+        {
+            if (category == null)
+            {
+                throw new ArgumentNullException(nameof(category));
+            }
+
+            var request = new HttpRequestMessage(HttpMethod.Post, noteCategoriesRoute);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            CreateCategoryRequest model = ToCreateCategoryRequest(category);
+            request.Content = JsonContent.Create(model);
+
+            var response = await _httpClient.SendAsync(request);
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new HttpRequestException($"HTTP request failed with status code: {response.StatusCode}");
+            }
+
+            var categoryResponse = await response.Content.ReadFromJsonAsync<GetCategoryResponse>()
+                ?? new GetCategoryResponse();
+            return ToCategory(categoryResponse);
+        }
+
+        private UpdateCategoryRequest ToUpdateCategoryRequest(NoteCategoryModel category)
+        {
+            return new UpdateCategoryRequest { Name = category.Name, };
+        }
+
+        public async Task UpdateNoteCategoryAsync(string token, NoteCategoryModel category)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Put, noteCategoriesRoute + category.Id);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            UpdateCategoryRequest model = ToUpdateCategoryRequest(category);
+            request.Content = JsonContent.Create(model);
+
+            var response = await _httpClient.SendAsync(request);
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new HttpRequestException($"HTTP request failed with status code: {response.StatusCode}");
+            }
+        }
+
+        public async Task DeleteNoteCategoryAsync(string token, int id)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Delete, noteCategoriesRoute + id);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var response = await _httpClient.SendAsync(request);
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new HttpRequestException($"HTTP request failed with status code: {response.StatusCode}");
+            }
+        }
     }
 }
