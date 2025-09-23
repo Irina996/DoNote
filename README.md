@@ -7,5 +7,7 @@
 ---
 
 ## 🧩 Repository Structure
-[WebNotes](WebNotes/README.md)  # Asp.NET Core API
-[WpfNotes](WpfNotes/README.md)  # WPF Client
+
+- [ApiNotes](WebNotes/README.md)  # Asp.NET Core API
+- [WpfNotes](WpfNotes/README.md)  # WPF Client
+- [WebNotesClient](WebNotesClient/README.md) # ASP.NET MVC Web client
