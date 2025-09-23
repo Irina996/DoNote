@@ -45,14 +45,14 @@
 			}
 		</div>
 		<div class="col-md-9 grey-yellow-bg">
-			<h2>Notes</h2>
+			@* <h2>Notes</h2> *@
 			<form asp-action="Index" method="get" asp-for-categoryId="@Model.SelectedCategoryId">
 				<input id="searchInput"
 					   name="searchText"
 					   type="search"
 					   placeholder="Search..."
 					   value="@Model.SearchQuery"
-					   class="form-control" />
+					   class="form-control my-3" />
 			</form>
 			@foreach (var note in Model.Notes)
 			{
