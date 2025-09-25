@@ -217,7 +217,6 @@ namespace WpfNotes.ViewModels
                 categories.RemoveAt(0); // remove "All" category
                 NoteModel noteModel = new NoteModel(note, categories);
                 noteModel.TogglePin();
-                note.ChangeDate = DateTime.Now;
                 FilterNotes();
             }
         }

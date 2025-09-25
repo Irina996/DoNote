@@ -446,6 +446,23 @@ namespace WpfNotes.Services
             }
         }
 
+        public async Task ToggleCompleteTask(TaskItem task)
+        {
+            if (task == null)
+            {
+                throw new ArgumentNullException(nameof(task));
+            }
+
+            var request = new HttpRequestMessage(HttpMethod.Patch, notesRoute + task.Id + "/complete");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+
+            var response = await _httpClient.SendAsync(request);
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new HttpRequestException($"HTTP request failed with status code: {response.StatusCode}");
+            }
+        }
+
         public async Task<TaskCategory> CreateTaskCategoryAsync(TaskCategory category)
         {
             if (category == null)

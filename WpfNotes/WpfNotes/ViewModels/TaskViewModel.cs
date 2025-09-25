@@ -39,7 +39,7 @@ namespace WpfNotes.ViewModels
         public ICommand DeleteCommand { get; }
         public ICommand CancelCommand { get; }
         public ICommand BackCommand { get; }
-        public ICommand NotificationCommand { get; }
+        public ICommand ToggleCompleteTaskCommand { get; }
 
         public Action Change { get; set; }
 
@@ -58,7 +58,7 @@ namespace WpfNotes.ViewModels
             DeleteCommand = new AsyncRelayCommand(DeleteTask);
             CancelCommand = new RelayCommand(Cancel);
             BackCommand = new RelayCommand(Back);
-            NotificationCommand = new RelayCommand(SetNotification);
+            ToggleCompleteTaskCommand = new AsyncRelayCommand(ToggleTaskComplete);
         }
 
         private void OnModelPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -105,9 +105,12 @@ namespace WpfNotes.ViewModels
             }
         }
 
-        private void SetNotification()
+        private async Task ToggleTaskComplete()
         {
-            throw new NotImplementedException();
+            if (!isNewTask)
+            {
+                await _taskModel.ToggleTaskComplete();
+            }
         }
 
         private void Back()
