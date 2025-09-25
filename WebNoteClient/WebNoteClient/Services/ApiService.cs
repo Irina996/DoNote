@@ -411,13 +411,8 @@ namespace WebNoteClient.Services
 
         public async Task ToggleTaskCompleteAsync(string token, int id)
         {
-            var request = new HttpRequestMessage(HttpMethod.Put, tasksRoute + id);
+            var request = new HttpRequestMessage(HttpMethod.Patch, tasksRoute + id + "/complete/");
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-            var task = await GetTaskItemAsync(token, id);
-            task.IsCompleted = !task.IsCompleted;
-            UpdateTaskRequest model = ToUpdateTaskRequest(task);
-            request.Content = JsonContent.Create(model);
 
             var response = await _httpClient.SendAsync(request);
             if (!response.IsSuccessStatusCode)
