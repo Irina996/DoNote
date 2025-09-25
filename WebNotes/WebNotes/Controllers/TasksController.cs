@@ -191,5 +191,32 @@ namespace WebNotes.Controllers {
                 }
             };
         }
+
+        /// <summary>
+        /// Update task complete state
+        /// </summary>
+        /// <param name="id">Task id that needed to change complete state</param>
+        /// <returns>No content if the update is successful.</returns>
+        /// <response code="204">Indicates the task was successfully updated.</response>
+        /// <response code="401">If the user is not authenticated.</response>
+        /// <response code="404">If the task does not exist or does not belong to the user.</response>
+        [HttpPatch("{id}/complete")]
+        public async Task<IActionResult> ToggleTaskComplete(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            var task = await _context.TaskItems.Include(x => x.Category)
+                .FirstOrDefaultAsync(x => x.Id == id && user.Id == x.Category.UserId);
+            if (task == null)
+            {
+                return NotFound(new { message = "Task not found or access denied." });
+            }
+
+            task.IsCompleted = !task.IsCompleted;
+            _context.TaskItems.Update(task);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
     }
 }
