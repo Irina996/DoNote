@@ -453,7 +453,7 @@ namespace WpfNotes.Services
                 throw new ArgumentNullException(nameof(task));
             }
 
-            var request = new HttpRequestMessage(HttpMethod.Patch, notesRoute + task.Id + "/complete");
+            var request = new HttpRequestMessage(HttpMethod.Patch, tasksRoute + task.Id + "/complete");
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
 
             var response = await _httpClient.SendAsync(request);

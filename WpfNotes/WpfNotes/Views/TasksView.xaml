@@ -193,7 +193,7 @@
                                     <Style TargetType="Button">
                                         <Setter Property="Foreground" Value="Gray" />
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsPinned}" Value="True">
+                                            <DataTrigger Binding="{Binding IsCompleted}" Value="True">
                                                 <Setter Property="Foreground" Value="Black" />
                                             </DataTrigger>
                                         </Style.Triggers>
