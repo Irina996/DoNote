@@ -1,39 +1,43 @@
-﻿@model WebNoteClient.Models.Note.EditNoteViewModel
+﻿@model WebNoteClient.Models.TaskItem.EditTaskViewModel
 
 @{
-    ViewData["Title"] = "Edit Note";
+    ViewData["Title"] = "Edit Task";
 }
 
 <h1>Edit</h1>
 
-<h4>Note</h4>
+<h4>Task</h4>
 <hr />
 <div class="row">
     <div>
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input asp-for="Note.Id" type="hidden" />
-            <div class="form-group col-md-4 my-3">
-                <input asp-for="Note.Title" class="form-control title" />
-                <span asp-validation-for="Note.Title" class="text-danger"></span>
-            </div>
+            <input asp-for="TaskItem.Id" type="hidden" />
             <div class="form-group my-3">
-                <textarea asp-for="Note.Content" class="form-control auto-resize-textarea"></textarea>
-                <span asp-validation-for="Note.Content" class="text-danger"></span>
+                <textarea asp-for="TaskItem.Content" class="form-control auto-resize-textarea"></textarea>
+                <span asp-validation-for="TaskItem.Content" class="text-danger"></span>
             </div>
             <div class="form-group form-check my-3">
                 <label class="form-check-label">
-                    <input class="form-check-input" asp-for="Note.IsPinned" /> @Html.DisplayNameFor(model => model.Note.IsPinned)
+                    <input class="form-check-input" asp-for="TaskItem.IsCompleted" /> 
+                    @Html.DisplayNameFor(model => model.TaskItem.IsCompleted)
                 </label>
             </div>
             <div class="form-group my-3">
-                <select asp-for="Note.Category.Id">
+                <select asp-for="TaskItem.Category.Id">
                     @foreach (var category in Model.Categories)
                     {
                         <option value="@category.Id">@category.Name</option>
                     }
                 </select>
-                <span asp-validation-for="Note.Category" class="text-danger"></span>
+                <span asp-validation-for="TaskItem.Category" class="text-danger"></span>
+            </div>
+            <div class="form-group my-3">
+                <input asp-for="TaskItem.Notification"
+                       type="datetime-local"
+                       max="@DateTime.Now.AddYears(1).ToString("yyyy-MM-ddTHH:mm")"
+                       min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+                <span asp-validation-for="TaskItem.Notification" class="text-danger"></span>
             </div>
             <div class="form-group my-3">
                 <input type="submit" value="Save" class="btn btn-primary" />
@@ -47,7 +51,9 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const textarea = document.querySelector('textarea.auto-resize-textarea');

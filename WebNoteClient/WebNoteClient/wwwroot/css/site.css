@@ -106,7 +106,7 @@ pre {
         font-size: 1.5rem;
     }
 
-    .item-card div.pre {
+    .item-card div pre {
         white-space: pre-wrap;
         word-wrap: break-word;
         border: none;
@@ -137,15 +137,17 @@ pre {
 
 .title {
     font-size: 1.6rem;
+    word-wrap: break-word;
 }
 
-textarea {
+.auto-resize-textarea {
+    min-height: 25vh;
+    max-height: 50vh;
+    resize: none;
+    overflow-y: auto;
+    transition: height 0.1s ease;
     font-size: 1rem;
     padding: 8px;
-    resize: vertical; 
-    height: 70%;
-    width: 70%;
-    background-color: white;
 }
 
 

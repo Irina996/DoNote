@@ -1,58 +1,54 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using System.Reflection;
-using System.Threading.Tasks;
 using WebNoteClient.Models;
 using WebNoteClient.Models.Note;
+using WebNoteClient.Models.TaskItem;
 using WebNoteClient.Services;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WebNoteClient.Controllers
 {
     [Authorize]
-    public class NoteController : Controller
+    public class TaskItemController : Controller
     {
         private readonly ApiService _apiService;
 
-        public NoteController(ApiService apiService)
+        public TaskItemController(ApiService apiService)
         {
             _apiService = apiService;
         }
 
-        // GET: NoteController
+        // GET: TaskController
         public async Task<IActionResult> Index(int? categoryId, string? searchText)
         {
             var accessTokenClaim = HttpContext.User.FindFirst("AccessToken");
             if (accessTokenClaim == null)
             {
                 return RedirectToAction("Login", "Auth");
-            }
-            IEnumerable<NoteModel> notes = await _apiService.GetNotesAsync(accessTokenClaim.Value);
-            var categories = await _apiService.GetNoteCategoriesAsync(accessTokenClaim.Value);
+            }            
+            var categories = await _apiService.GetTaskCategoriesAsync(accessTokenClaim.Value);
+            IEnumerable<TaskItemModel> tasks = await _apiService.GetTasksAsync(accessTokenClaim.Value);
             if (categoryId != null)
             {
-                notes = notes.Where(n => n.Category.Id == categoryId);
+                tasks = tasks.Where(t => t.Category.Id == categoryId);
             }
             if (searchText != null)
             {
-                notes = notes
-                    .Where(n => n.Title.Contains(searchText, StringComparison.OrdinalIgnoreCase) 
-                    || n.Content.Contains(searchText, StringComparison.OrdinalIgnoreCase));
+                tasks = tasks.Where(t => t.Content.Contains(searchText, StringComparison.OrdinalIgnoreCase));
             }
-            notes = notes
-                .OrderByDescending(n => n.IsPinned)
-                .ThenByDescending(n => n.ChangeDate);
-            var model = new NotePageViewModel
+            var model = new TaskPageViewModel
             {
+                TaskItems = tasks.ToList(),
                 Categories = categories,
-                Notes = notes.ToList(),
                 SelectedCategoryId = categoryId,
                 SearchQuery = searchText,
             };
             return View(model);
         }
 
-        // GET: NoteController/Create
+        // GET: TaskController/Create
         public async Task<IActionResult> Create()
         {
             var accessTokenClaim = HttpContext.User.FindFirst("AccessToken");
@@ -60,15 +56,20 @@ namespace WebNoteClient.Controllers
             {
                 return RedirectToAction("Login", "Auth");
             }
-            var categories = await _apiService.GetNoteCategoriesAsync(accessTokenClaim.Value);
-            NoteModel note = new NoteModel();
-            return View(new CreateNoteViewModel { Categories = categories, Note = note });
+            
+            var categories = await _apiService.GetTaskCategoriesAsync(accessTokenClaim.Value);
+            var model = new CreateTaskViewModel
+            {
+                TaskItem = new TaskItemModel(),
+                Categories = categories
+            };
+            return View(model);
         }
 
-        // POST: NoteController/Create
+        // POST: TaskController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(NoteModel note)
+        public async Task<IActionResult> Create(TaskItemModel task)
         {
             try
             {
@@ -77,7 +78,7 @@ namespace WebNoteClient.Controllers
                 {
                     return RedirectToAction("Login", "Auth");
                 }
-                await _apiService.CreateNoteAsync(accessTokenClaim.Value, note);
+                await _apiService.CreateTaskItemAsync(accessTokenClaim.Value, task);
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -86,27 +87,28 @@ namespace WebNoteClient.Controllers
             }
         }
 
-        // GET: NoteController/Edit/5
+        // GET: TaskController/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
             var accessTokenClaim = HttpContext.User.FindFirst("AccessToken");
-            if (accessTokenClaim == null)
+            if (accessTokenClaim == null) 
             {
                 return RedirectToAction("Login", "Auth");
             }
-            var categories = await _apiService.GetNoteCategoriesAsync(accessTokenClaim.Value);
-            NoteModel note = await _apiService.GetNoteAsync(accessTokenClaim.Value, (int)id);
-            if (note == null)
+            var task = await _apiService.GetTaskItemAsync(accessTokenClaim.Value, id);
+            var categories = await _apiService.GetTaskCategoriesAsync(accessTokenClaim.Value);
+            var model = new EditTaskViewModel 
             {
-                throw new InvalidOperationException("Note does not exist or access denied");
-            }
-            return View(new EditNoteViewModel { Categories = categories, Note = note});
+                TaskItem = task,
+                Categories = categories 
+            };
+            return View(model);
         }
 
-        // POST: NoteController/Edit/5
+        // POST: TaskController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(NoteModel note)
+        public async Task<ActionResult> Edit(int id, TaskItemModel taskItem)
         {
             try
             {
@@ -115,7 +117,7 @@ namespace WebNoteClient.Controllers
                 {
                     return RedirectToAction("Login", "Auth");
                 }
-                await _apiService.UpdateNoteAsync(accessTokenClaim.Value, note);
+                await _apiService.UpdateTaskItemAsync(accessTokenClaim.Value, taskItem);
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -124,10 +126,10 @@ namespace WebNoteClient.Controllers
             }
         }
 
-        // POST: NoteController/Delete/5
+        // POST: TaskController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id, IFormCollection collection)
         {
             try
             {
@@ -136,8 +138,8 @@ namespace WebNoteClient.Controllers
                 {
                     return RedirectToAction("Login", "Auth");
                 }
-                await _apiService.DeleteNoteAsync(accessTokenClaim.Value, id);
-                return RedirectToAction(nameof(Index), new { message = "Note was deleted successfully." });
+                await _apiService.DeleteTaskItemAsync(accessTokenClaim.Value, id);
+                return RedirectToAction(nameof(Index), new { message = "Task was deleted successfully." });
             }
             catch
             {
@@ -147,7 +149,7 @@ namespace WebNoteClient.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> TogglePin(int id)
+        public async Task<IActionResult> ToggleComplete(int id)
         {
             try
             {
@@ -156,7 +158,7 @@ namespace WebNoteClient.Controllers
                 {
                     return RedirectToAction("Login", "Auth");
                 }
-                await _apiService.ToggleNotePinAsync(accessTokenClaim.Value, id);
+                await _apiService.ToggleTaskCompleteAsync(accessTokenClaim.Value, id);
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -166,7 +168,7 @@ namespace WebNoteClient.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> CreateCategory([FromBody] NoteCategoryModel model)
+        public async Task<JsonResult> CreateCategory([FromBody] TaskCategoryModel model)
         {
             try
             {
@@ -176,7 +178,7 @@ namespace WebNoteClient.Controllers
                     throw new AccessViolationException("Access denied");
                 }
 
-                await _apiService.CreateNoteCategoryAsync(accessTokenClaim.Value, model);
+                await _apiService.CreateTaskCategoryAsync(accessTokenClaim.Value, model);
 
                 return Json(new { success = true });
             }
@@ -187,7 +189,7 @@ namespace WebNoteClient.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> UpdateCategory([FromBody] NoteCategoryModel model)
+        public async Task<JsonResult> UpdateCategory([FromBody] TaskCategoryModel model)
         {
             try
             {
@@ -197,7 +199,7 @@ namespace WebNoteClient.Controllers
                     throw new AccessViolationException("Access denied");
                 }
 
-                await _apiService.UpdateNoteCategoryAsync(accessTokenClaim.Value, model);
+                await _apiService.UpdateTaskCategoryAsync(accessTokenClaim.Value, model);
 
                 return Json(new { success = true });
             }
@@ -217,7 +219,7 @@ namespace WebNoteClient.Controllers
                 {
                     return RedirectToAction("Login", "Auth");
                 }
-                await _apiService.DeleteNoteCategoryAsync(accessTokenClaim.Value, id);
+                await _apiService.DeleteTaskCategoryAsync(accessTokenClaim.Value, id);
                 return RedirectToAction(nameof(Index), new { message = "Category was deleted successfully." });
             }
             catch
