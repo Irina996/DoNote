@@ -13,13 +13,15 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group col-md-4 my-3">
-                <label asp-for="Note.Title" class="control-label"></label>
-                <input asp-for="Note.Title" class="form-control" />
+                <input asp-for="Note.Title" class="form-control" placeholder="Note title..."/>
                 <span asp-validation-for="Note.Title" class="text-danger"></span>
             </div>
             <div class="form-group my-3">
-                <label asp-for="Note.Content" class="control-label"></label>
-                <textarea asp-for="Note.Content" class="form-control auto-resize-textarea"></textarea>
+                <textarea 
+                    asp-for="Note.Content" 
+                    class="form-control auto-resize-textarea" 
+                    placeholder="Write something...">
+                </textarea>
                 <span asp-validation-for="Note.Content" class="text-danger"></span>
             </div>
             <div class="form-group form-check my-3">
