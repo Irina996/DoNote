@@ -85,6 +85,13 @@ namespace WpfNotes.Models.TaskItem
             _prevTask.Content = null;
         }
 
+        public async Task ToggleTaskComplete()
+        {
+            _prevTask.IsCompleted = !_prevTask.IsCompleted;
+            await _apiService.ToggleCompleteTask(_prevTask);
+            _task.IsCompleted = _prevTask.IsCompleted;
+        }
+
         public async Task CancelChanges()
         {
             CopyVersion();

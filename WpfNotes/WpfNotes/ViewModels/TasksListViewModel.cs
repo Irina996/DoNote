@@ -95,6 +95,7 @@ namespace WpfNotes.ViewModels
         public ICommand EditCategoryCommand { get; }
         public ICommand SearchTaskCommand { get; }
         public ICommand ChangeSelectedCategoryCommand { get; }
+        public ICommand ToggleTaskCompleteCommand { get; }
 
         public TasksListViewModel()
         {
@@ -111,6 +112,7 @@ namespace WpfNotes.ViewModels
             EditCategoryCommand = new RelayCommand(EditCategory);
             SearchTaskCommand = new RelayCommand(FilterTasks);
             ChangeSelectedCategoryCommand = new RelayCommand(FilterTasks);
+            ToggleTaskCompleteCommand = new RelayCommand(ToggleTaskComplete);
 
             _allTasks = new ObservableCollection<TaskItem>();
             _tasks = new ObservableCollection<TaskItem>();
@@ -231,6 +233,18 @@ namespace WpfNotes.ViewModels
             else
             {
                 _tasksModel.FilterTasks(SearchText, SelectedCategory);
+            }
+        }
+
+        private void ToggleTaskComplete(object obj)
+        {
+            if (obj is TaskItem taskItem)
+            {
+                var categories = new List<TaskCategory>(_categories);
+                categories.RemoveAt(0); // remove "All" category
+                var taskItemModel = new TaskModel(taskItem, categories);
+                taskItemModel.ToggleTaskComplete();
+                //FilterTasks();
             }
         }
     }

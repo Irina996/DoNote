@@ -168,8 +168,41 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Button
+                                Grid.Row="0"
+                                Grid.RowSpan="2"
+                                Grid.Column="0"
+                                Width="Auto"
+                                Height="Auto"
+                                Margin="10"
+                                Padding="0"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Top"
+                                Background="Transparent"
+                                BorderBrush="Transparent"
+                                BorderThickness="0"
+                                Command="{Binding DataContext.ToggleTaskCompleteCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                CommandParameter="{Binding}"
+                                Content="✓"
+                                FontSize="20">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Foreground" Value="Gray" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsPinned}" Value="True">
+                                                <Setter Property="Foreground" Value="Black" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
                             <TextBlock
                                 Grid.Row="0"
+                                Grid.Column="1"
                                 MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
                                 MaxHeight="44"
                                 Margin="10,5,10,0"
@@ -179,6 +212,7 @@
                                 TextWrapping="Wrap" />
                             <TextBlock
                                 Grid.Row="1"
+                                Grid.Column="1"
                                 Margin="10,5,10,5"
                                 FontSize="10"
                                 Foreground="#868e96"
