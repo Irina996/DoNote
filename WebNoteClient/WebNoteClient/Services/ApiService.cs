@@ -23,6 +23,7 @@ namespace WebNoteClient.Services
             _httpClient = httpClient;
         }
 
+        #region NoteMappers
         private NoteModel ToNote(GetNoteResponse response)
         {
             return new NoteModel
@@ -63,6 +64,90 @@ namespace WebNoteClient.Services
             };
         }
 
+        #endregion
+
+        #region TaskMappers
+        private TaskItemModel ToTaskItem(GetTaskResponse response)
+        {
+            return new TaskItemModel
+            {
+                Id = response.Id,
+                Content = response.Content,
+                IsCompleted = response.IsCompleted,
+                CreationDate = response.CreationDate.ToLocalTime(),
+                Notification = response.Notification?.ToLocalTime(),
+                Category = new TaskCategoryModel
+                {
+                    Id = response.Category.Id,
+                    Name = response.Category.Name
+                }
+            };
+        }
+
+        private CreateTaskRequest ToCreateTaskRequest(TaskItemModel task)
+        {
+            return new CreateTaskRequest
+            {
+                Content = task.Content,
+                Notification = task.Notification?.ToUniversalTime(),
+                CategoryId = task.Category.Id,
+            };
+        }
+
+        private UpdateTaskRequest ToUpdateTaskRequest(TaskItemModel task)
+        {
+            return new UpdateTaskRequest
+            {
+                Content = task.Content,
+                IsCompleted = task.IsCompleted,
+                Notification = task.Notification?.ToUniversalTime(),
+                CategoryId = task.Category.Id,
+            };
+        }
+        #endregion
+
+        #region CategoryMappers
+        private NoteCategoryModel ToCategory(GetCategoryResponse response)
+        {
+            return new NoteCategoryModel
+            { 
+                Id = response.Id, 
+                Name = response.Name 
+            };
+        }
+
+        private TaskCategoryModel ToTaskCategory(GetCategoryResponse response)
+        {
+            return new TaskCategoryModel
+            {
+                Id = response.Id,
+                Name = response.Name,
+            };
+        }
+
+        private CreateCategoryRequest ToCreateCategoryRequest(NoteCategoryModel category)
+        {
+            return new CreateCategoryRequest { Name = category.Name, };
+        }
+
+        private CreateCategoryRequest ToCreateCategoryRequest(TaskCategoryModel category)
+        {
+            return new CreateCategoryRequest { Name = category.Name, };
+        }
+
+        private UpdateCategoryRequest ToUpdateCategoryRequest(NoteCategoryModel category)
+        {
+            return new UpdateCategoryRequest { Name = category.Name, };
+        }
+
+        private UpdateCategoryRequest ToUpdateCategoryRequest(TaskCategoryModel category)
+        {
+            return new UpdateCategoryRequest { Name = category.Name, };
+        }
+        
+        #endregion
+
+        #region Notes
         public async Task<List<NoteModel>> GetNotesAsync(string token)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, notesRoute);
@@ -80,32 +165,6 @@ namespace WebNoteClient.Services
             return noteResponses.Select(ToNote).ToList();
         }
 
-        private NoteCategoryModel ToCategory(GetCategoryResponse response)
-        {
-            return new NoteCategoryModel
-            { 
-                Id = response.Id, 
-                Name = response.Name 
-            };
-        }
-
-        public async Task<List<NoteCategoryModel>> GetNoteCategoriesAsync(string token)
-        {
-            var request = new HttpRequestMessage(HttpMethod.Get, noteCategoriesRoute);
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-            var response = await _httpClient.SendAsync(request);
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new HttpRequestException($"HTTP request failed with status code: {response.StatusCode}");
-            }
-
-            var categoryReponses = await response.Content.ReadFromJsonAsync<List<GetCategoryResponse>>()
-                ?? new List<GetCategoryResponse>();
-
-            return categoryReponses.Select(ToCategory).ToList();
-        }
-
         public async Task<NoteModel> GetNoteAsync(string token, int id)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, notesRoute + id);
@@ -117,7 +176,7 @@ namespace WebNoteClient.Services
                 throw new HttpRequestException($"HTTP request failed with status code: {response.StatusCode}");
             }
 
-            var noteReponse = await response.Content.ReadFromJsonAsync<GetNoteResponse>() 
+            var noteReponse = await response.Content.ReadFromJsonAsync<GetNoteResponse>()
                 ?? new GetNoteResponse();
             return ToNote(noteReponse);
         }
@@ -190,9 +249,24 @@ namespace WebNoteClient.Services
             }
         }
 
-        private CreateCategoryRequest ToCreateCategoryRequest(NoteCategoryModel category)
+        #endregion
+
+        #region NoteCategories
+        public async Task<List<NoteCategoryModel>> GetNoteCategoriesAsync(string token)
         {
-            return new CreateCategoryRequest { Name = category.Name, };
+            var request = new HttpRequestMessage(HttpMethod.Get, noteCategoriesRoute);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var response = await _httpClient.SendAsync(request);
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new HttpRequestException($"HTTP request failed with status code: {response.StatusCode}");
+            }
+
+            var categoryReponses = await response.Content.ReadFromJsonAsync<List<GetCategoryResponse>>()
+                ?? new List<GetCategoryResponse>();
+
+            return categoryReponses.Select(ToCategory).ToList();
         }
 
         public async Task<NoteCategoryModel> CreateNoteCategoryAsync(string token, NoteCategoryModel category)
@@ -217,11 +291,6 @@ namespace WebNoteClient.Services
             var categoryResponse = await response.Content.ReadFromJsonAsync<GetCategoryResponse>()
                 ?? new GetCategoryResponse();
             return ToCategory(categoryResponse);
-        }
-
-        private UpdateCategoryRequest ToUpdateCategoryRequest(NoteCategoryModel category)
-        {
-            return new UpdateCategoryRequest { Name = category.Name, };
         }
 
         public async Task UpdateNoteCategoryAsync(string token, NoteCategoryModel category)
@@ -251,23 +320,9 @@ namespace WebNoteClient.Services
             }
         }
 
-        private TaskItemModel ToTaskItem(GetTaskResponse response)
-        {
-            return new TaskItemModel
-            {
-                Id = response.Id,
-                Content = response.Content,
-                IsCompleted = response.IsCompleted,
-                CreationDate = response.CreationDate.ToLocalTime(),
-                Notification = response.Notification?.ToLocalTime(),
-                Category = new TaskCategoryModel
-                {
-                    Id = response.Category.Id,
-                    Name = response.Category.Name
-                }
-            };
-        }
+        #endregion
 
+        #region Tasks
         public async Task<List<TaskItemModel>> GetTasksAsync(string token)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, tasksRoute);
@@ -283,31 +338,6 @@ namespace WebNoteClient.Services
             return taskItemResponses.Select(ToTaskItem).ToList();
         }
 
-        private TaskCategoryModel ToTaskCategory(GetCategoryResponse response)
-        {
-            return new TaskCategoryModel
-            {
-                Id = response.Id,
-                Name = response.Name,
-            };
-        }
-
-        public async Task<List<TaskCategoryModel>> GetTaskCategoriesAsync(string token)
-        {
-            var request = new HttpRequestMessage(HttpMethod.Get, taskCategoriesRoute);
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-            var response = await _httpClient.SendAsync(request);
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new HttpRequestException($"HTTP request failed with status code: {response.StatusCode}");
-            }
-
-            var categoryResponses = await response.Content.ReadFromJsonAsync<List<GetCategoryResponse>>()
-                ?? new List<GetCategoryResponse>();
-            return categoryResponses.Select(ToTaskCategory).ToList();
-        }
-
         public async Task<TaskItemModel> GetTaskItemAsync(string token, int id)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, tasksRoute + id);
@@ -321,16 +351,6 @@ namespace WebNoteClient.Services
             var taskItemResponse = await response.Content.ReadFromJsonAsync<GetTaskResponse>()
                 ?? new GetTaskResponse();
             return ToTaskItem(taskItemResponse);
-        }
-
-        private CreateTaskRequest ToCreateTaskRequest(TaskItemModel task)
-        {
-            return new CreateTaskRequest
-            {
-                Content = task.Content,
-                Notification = task.Notification?.ToUniversalTime(),
-                CategoryId = task.Category.Id,
-            };
         }
 
         public async Task<TaskItemModel> CreateTaskItemAsync(string token, TaskItemModel task)
@@ -355,17 +375,6 @@ namespace WebNoteClient.Services
             var taskResponse = await response.Content.ReadFromJsonAsync<GetTaskResponse>()
                 ?? new GetTaskResponse();
             return ToTaskItem(taskResponse);
-        }
-
-        private UpdateTaskRequest ToUpdateTaskRequest(TaskItemModel task)
-        {
-            return new UpdateTaskRequest
-            {
-                Content = task.Content,
-                IsCompleted = task.IsCompleted,
-                Notification = task.Notification?.ToUniversalTime(),
-                CategoryId = task.Category.Id,
-            };
         }
 
         public async Task UpdateTaskItemAsync(string token, TaskItemModel task)
@@ -417,9 +426,24 @@ namespace WebNoteClient.Services
             }
         }
 
-        private CreateCategoryRequest ToCreateCategoryRequest(TaskCategoryModel category)
+        #endregion
+
+        #region TaskCategories
+
+        public async Task<List<TaskCategoryModel>> GetTaskCategoriesAsync(string token)
         {
-            return new CreateCategoryRequest { Name = category.Name, };
+            var request = new HttpRequestMessage(HttpMethod.Get, taskCategoriesRoute);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var response = await _httpClient.SendAsync(request);
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new HttpRequestException($"HTTP request failed with status code: {response.StatusCode}");
+            }
+
+            var categoryResponses = await response.Content.ReadFromJsonAsync<List<GetCategoryResponse>>()
+                ?? new List<GetCategoryResponse>();
+            return categoryResponses.Select(ToTaskCategory).ToList();
         }
 
         public async Task<TaskCategoryModel> CreateTaskCategoryAsync(string token, TaskCategoryModel category)
@@ -444,11 +468,6 @@ namespace WebNoteClient.Services
             var categoryResponse = await response.Content.ReadFromJsonAsync<GetCategoryResponse>()
                 ?? new GetCategoryResponse();
             return ToTaskCategory(categoryResponse);
-        }
-
-        private UpdateCategoryRequest ToUpdateCategoryRequest(TaskCategoryModel category)
-        {
-            return new UpdateCategoryRequest { Name = category.Name, };
         }
 
         public async Task UpdateTaskCategoryAsync(string token, TaskCategoryModel category)
@@ -477,5 +496,7 @@ namespace WebNoteClient.Services
                 throw new HttpRequestException($"HTTP request failed with status code: {response.StatusCode}");
             }
         }
+
+        #endregion
     }
 }
