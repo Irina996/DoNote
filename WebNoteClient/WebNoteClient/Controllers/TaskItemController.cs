@@ -1,12 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using WebNoteClient.Models;
-using WebNoteClient.Models.Note;
 using WebNoteClient.Models.TaskItem;
 using WebNoteClient.Services;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WebNoteClient.Controllers
 {
