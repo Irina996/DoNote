@@ -38,6 +38,7 @@ namespace WebNoteClient.Controllers
             {
                 tasks = tasks.Where(t => t.Content.Contains(searchText, StringComparison.OrdinalIgnoreCase));
             }
+            tasks = tasks.OrderByDescending(x => x.CreationDate);
             var model = new TaskPageViewModel
             {
                 TaskItems = tasks.ToList(),
@@ -69,7 +70,7 @@ namespace WebNoteClient.Controllers
         // POST: TaskController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(TaskItemModel task)
+        public async Task<IActionResult> Create(TaskItemModel taskItem)
         {
             try
             {
@@ -78,7 +79,7 @@ namespace WebNoteClient.Controllers
                 {
                     return RedirectToAction("Login", "Auth");
                 }
-                await _apiService.CreateTaskItemAsync(accessTokenClaim.Value, task);
+                await _apiService.CreateTaskItemAsync(accessTokenClaim.Value, taskItem);
                 return RedirectToAction(nameof(Index));
             }
             catch
