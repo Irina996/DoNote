@@ -113,6 +113,47 @@
 
 @section Scripts {
 	<script>
+		const tasks = @Html.Raw(Json.Serialize(Model.TaskItems
+			.Where(t => t.Notification != null && t.Notification >= DateTime.Now)
+			.Select(t => new {
+				content = t.Content,
+				notificationTime = t.Notification
+		})));
+
+		checkUpcomingNotifications();
+		showNotification("Example of notification");
+		setInterval(checkUpcomingNotifications, 5 * 60 * 1000);
+
+		function checkUpcomingNotifications() {
+			const now = new Date();
+			const fiveMinutesFromNow = new Date(now.getTime() + 5 * 60 * 1000);
+
+			for (const taskItem of tasks) {
+				const notifyTime = new Date(taskItem.notificationTime);
+				if (
+					notifyTime >= now &&
+					notifyTime < fiveMinutesFromNow
+				) {
+					 const delay = notifyTime.getTime() - now.getTime();
+					window.setTimeout(() => {showNotification(taskItem.content);}, delay);
+				}
+			}
+		}
+
+		function showNotification(text) {
+			if ("Notification" in window) {
+				if (Notification.permission === "granted") {
+					new Notification("Task notification", { body: text });
+				} else if (Notification.permission !== "denied") {
+					Notification.requestPermission().then(permission => {
+						if (permission === "granted") {
+							new Notification("Task notification", { body: text });
+						}
+					});
+				}
+			}
+		}
+
 		function openEditModal(categoryId, categoryName) {
 			// Set modal values
 			document.getElementById('editCategoryId').value = categoryId;
