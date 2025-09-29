@@ -10,9 +10,13 @@
 <hr />
 <div class="row">
     <div>
-        <form asp-action="Create">
+        <form asp-action="Create" id="createForm">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input asp-for="TaskItem.Id" type="hidden" />
+
+            <!-- Hidden field to store notification in UTC -->
+            <input type="hidden" id="notificationUtc" name="TaskItem.Notification" value="" />
+            
             <div class="form-group my-3">
                 <textarea 
                     asp-for="TaskItem.Content" 
@@ -21,6 +25,7 @@
                 </textarea>
                 <span asp-validation-for="TaskItem.Content" class="text-danger"></span>
             </div>
+
             <div class="form-group my-3">
                 <select asp-for="TaskItem.Category.Id">
                     @foreach (var category in Model.Categories)
@@ -30,13 +35,14 @@
                 </select>
                 <span asp-validation-for="TaskItem.Category" class="text-danger"></span>
             </div>
+
             <div class="form-group my-3">
-                <input asp-for="TaskItem.Notification"
+                <input id="localNotification"
                        type="datetime-local"
                        max="@DateTime.Now.AddYears(1).ToString("yyyy-MM-ddTHH:mm")"
                        min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
-                <span asp-validation-for="TaskItem.Notification" class="text-danger"></span>
             </div>
+
             <div class="form-group my-3">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
@@ -64,6 +70,63 @@
                 autoResize();
                 textarea.addEventListener('input', autoResize);
             }
+
+            // Convert notification from local to utc
+            // Get elements
+            const form = document.getElementById('createForm');
+            const localNotificationInput = document.getElementById('localNotification');
+            const notificationUtcInput = document.getElementById('notificationUtc');
+
+            if (!form || !localNotificationInput || !notificationUtcInput) {
+                console.error('Required elements not found!');
+                return;
+            }
+
+            // Add event listener to form submit
+            form.addEventListener('submit', function(e) {
+                e.preventDefault(); // Prevent immediate submit for debugging
+
+                console.log('=== Form Submit Debug ===');
+                console.log('Local input value:', localNotificationInput.value);
+
+                if (localNotificationInput.value) {
+                    try {
+                        // Create Date object from local time string
+                        const localDateTime = new Date(localNotificationInput.value);
+                        console.log('Parsed local datetime:', localDateTime);
+
+                        // Convert to UTC
+                        const utcDateTime = new Date(localDateTime.getTime() - (localDateTime.getTimezoneOffset() * 60000));
+                        console.log('Converted to UTC:', utcDateTime);
+
+                        // Format as YYYY-MM-DDTHH:mm (without seconds)
+                        const year = utcDateTime.getUTCFullYear();
+                        const month = String(utcDateTime.getUTCMonth() + 1).padStart(2, '0');
+                        const day = String(utcDateTime.getUTCDate()).padStart(2, '0');
+                        const hours = String(utcDateTime.getUTCHours()).padStart(2, '0');
+                        const minutes = String(utcDateTime.getUTCMinutes()).padStart(2, '0');
+
+                        const utcString = `${year}-${month}-${day}T${hours}:${minutes}`;
+                        console.log('Final UTC string:', utcString);
+
+                        // Set hidden field value
+                        notificationUtcInput.value = utcString;
+                        console.log('Hidden field set to:', notificationUtcInput.value);
+
+                        // Now submit the form
+                        this.submit();
+
+                    } catch (error) {
+                        console.error('Error converting datetime:', error);
+                        alert('Error converting date/time. Please check your input.');
+                    }
+                } else {
+                    // No value selected
+                    notificationUtcInput.value = '';
+                    console.log('No value selected, setting to empty');
+                    this.submit();
+                }
+            });
         });
     </script>
 }

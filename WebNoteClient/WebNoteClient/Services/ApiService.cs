@@ -74,8 +74,8 @@ namespace WebNoteClient.Services
                 Id = response.Id,
                 Content = response.Content,
                 IsCompleted = response.IsCompleted,
-                CreationDate = response.CreationDate.ToLocalTime(),
-                Notification = response.Notification?.ToLocalTime(),
+                CreationDate = response.CreationDate,
+                Notification = response.Notification,
                 Category = new TaskCategoryModel
                 {
                     Id = response.Category.Id,
